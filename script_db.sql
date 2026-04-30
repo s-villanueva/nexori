@@ -1,7 +1,7 @@
 -- ------------------------------------------------------------
 -- ROL_USUARIO
 -- ------------------------------------------------------------
-CREATE TABLE rol_usuario (
+CREATE TABLE IF NOT EXISTS rol_usuario (
                              id_rol      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                              nombre      VARCHAR(50)  NOT NULL UNIQUE,
                              descripcion TEXT
@@ -10,7 +10,7 @@ CREATE TABLE rol_usuario (
 -- ------------------------------------------------------------
 -- EMPRESA
 -- ------------------------------------------------------------
-CREATE TABLE empresa (
+CREATE TABLE IF NOT EXISTS empresa (
                          id_empresa   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                          nombre       VARCHAR(150) NOT NULL,
                          dominio      VARCHAR(100),
@@ -22,7 +22,7 @@ CREATE TABLE empresa (
 -- ------------------------------------------------------------
 -- CARGO_EMPRESA
 -- ------------------------------------------------------------
-CREATE TABLE cargo_empresa (
+CREATE TABLE IF NOT EXISTS cargo_empresa (
                                id_cargo_empresa UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                nombre           VARCHAR(150) NOT NULL
 );
@@ -30,12 +30,12 @@ CREATE TABLE cargo_empresa (
 -- ------------------------------------------------------------
 -- CONTACTOS_EMPRESA
 -- ------------------------------------------------------------
-CREATE TABLE contactos_empresa (
+CREATE TABLE IF NOT EXISTS contactos_empresa (
                                    id_contacto_empresa UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                    nombres             VARCHAR(150) NOT NULL,
                                    apellidos           VARCHAR(150) NOT NULL,
-                                   id_cargo_empresa    INT          NOT NULL,
-                                   id_empresa          INT          NOT NULL,
+                                   id_cargo_empresa    UUID          NOT NULL,
+                                   id_empresa          UUID          NOT NULL,
 
                                    CONSTRAINT fk_contacto_cargo   FOREIGN KEY (id_cargo_empresa) REFERENCES cargo_empresa (id_cargo_empresa),
                                    CONSTRAINT fk_contacto_empresa FOREIGN KEY (id_empresa)       REFERENCES empresa (id_empresa)
@@ -44,13 +44,13 @@ CREATE TABLE contactos_empresa (
 -- ------------------------------------------------------------
 -- SUCURSAL_EMPRESA
 -- ------------------------------------------------------------
-CREATE TABLE sucursal_empresa (
+CREATE TABLE IF NOT EXISTS sucursal_empresa (
                                   id_sucursal UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                   nombre      VARCHAR(150) NOT NULL,
                                   direccion   VARCHAR(255),
                                   coordenadas POINT,
                                   activo      BOOLEAN      NOT NULL DEFAULT TRUE,
-                                  id_empresa  INT          NOT NULL,
+                                  id_empresa  UUID          NOT NULL,
 
                                   CONSTRAINT fk_sucursal_empresa FOREIGN KEY (id_empresa) REFERENCES empresa (id_empresa)
 );
@@ -58,15 +58,15 @@ CREATE TABLE sucursal_empresa (
 -- ------------------------------------------------------------
 -- USUARIO
 -- ------------------------------------------------------------
-CREATE TABLE usuario (
+CREATE TABLE IF NOT EXISTS usuario (
                          id_usuario    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                          nombre        VARCHAR(150) NOT NULL,
                          email         VARCHAR(150) NOT NULL UNIQUE,
                          password_hash VARCHAR(255) NOT NULL,
                          activo        BOOLEAN      NOT NULL DEFAULT TRUE,
-                         id_empresa    INT          NOT NULL,
-                         id_sucursal   INT          NOT NULL,
-                         id_rol        INT          NOT NULL,
+                         id_empresa    UUID          NOT NULL,
+                         id_sucursal   UUID          NOT NULL,
+                         id_rol        UUID          NOT NULL,
 
                          CONSTRAINT fk_usuario_empresa   FOREIGN KEY (id_empresa)  REFERENCES empresa (id_empresa),
                          CONSTRAINT fk_usuario_sucursal  FOREIGN KEY (id_sucursal) REFERENCES sucursal_empresa (id_sucursal),
@@ -76,7 +76,7 @@ CREATE TABLE usuario (
 -- ------------------------------------------------------------
 -- CATEGORIA
 -- ------------------------------------------------------------
-CREATE TABLE categoria (
+CREATE TABLE IF NOT EXISTS categoria (
                            id_categoria UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                            nombre       VARCHAR(100) NOT NULL,
                            descripcion  TEXT
@@ -85,11 +85,11 @@ CREATE TABLE categoria (
 -- ------------------------------------------------------------
 -- PROVEEDOR
 -- ------------------------------------------------------------
-CREATE TABLE proveedor (
+CREATE TABLE IF NOT EXISTS proveedor (
                            id_proveedor        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                            porcentaje_comision DECIMAL(5,2)  NOT NULL DEFAULT 2.00,
                            activo              BOOLEAN       NOT NULL DEFAULT TRUE,
-                           id_empresa          INT           NOT NULL,
+                           id_empresa          UUID           NOT NULL,
 
                            CONSTRAINT fk_proveedor_empresa FOREIGN KEY (id_empresa) REFERENCES empresa (id_empresa)
 );
@@ -97,9 +97,9 @@ CREATE TABLE proveedor (
 -- ------------------------------------------------------------
 -- CAT_PROVEEDOR  (M:N categoria <-> proveedor)
 -- ------------------------------------------------------------
-CREATE TABLE cat_proveedor (
-                               id_categoria INT NOT NULL,
-                               id_proveedor INT NOT NULL,
+CREATE TABLE IF NOT EXISTS cat_proveedor (
+                               id_categoria UUID NOT NULL,
+                               id_proveedor UUID NOT NULL,
 
                                PRIMARY KEY (id_categoria, id_proveedor),
                                CONSTRAINT fk_catprov_categoria FOREIGN KEY (id_categoria) REFERENCES categoria (id_categoria),
@@ -109,13 +109,13 @@ CREATE TABLE cat_proveedor (
 -- ------------------------------------------------------------
 -- PRODUCTO
 -- ------------------------------------------------------------
-CREATE TABLE producto (
+CREATE TABLE IF NOT EXISTS producto (
                           sku           VARCHAR(100) PRIMARY KEY,
                           nombre        VARCHAR(200) NOT NULL,
                           descripcion   TEXT,
                           unidad_medida VARCHAR(50),
                           activo        BOOLEAN      NOT NULL DEFAULT TRUE,
-                          id_categoria  INT,
+                          id_categoria  UUID,
 
                           CONSTRAINT fk_producto_categoria FOREIGN KEY (id_categoria) REFERENCES categoria (id_categoria)
 );
@@ -123,13 +123,13 @@ CREATE TABLE producto (
 -- ------------------------------------------------------------
 -- ALMACEN
 -- ------------------------------------------------------------
-CREATE TABLE almacen (
+CREATE TABLE IF NOT EXISTS almacen (
                          id_almacen   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                          nombre       VARCHAR(150) NOT NULL,
                          direccion    VARCHAR(255),
                          coordenadas  POINT,
                          activo       BOOLEAN      NOT NULL DEFAULT TRUE,
-                         id_proveedor INT          NOT NULL,
+                         id_proveedor UUID          NOT NULL,
 
                          CONSTRAINT fk_almacen_proveedor FOREIGN KEY (id_proveedor) REFERENCES proveedor (id_proveedor)
 );
@@ -137,8 +137,8 @@ CREATE TABLE almacen (
 -- ------------------------------------------------------------
 -- PRODUCTO_ALMACEN  (M:N producto <-> almacen)
 -- ------------------------------------------------------------
-CREATE TABLE producto_almacen (
-                                  id_almacen INT          NOT NULL,
+CREATE TABLE IF NOT EXISTS producto_almacen (
+                                  id_almacen UUID          NOT NULL,
                                   sku        VARCHAR(100) NOT NULL,
                                   stock      INT          NOT NULL DEFAULT 0,
                                   max        DECIMAL(14,2),
@@ -153,11 +153,11 @@ CREATE TABLE producto_almacen (
 -- ------------------------------------------------------------
 -- TARIFA_REGLA
 -- ------------------------------------------------------------
-CREATE TABLE tarifa_regla (
+CREATE TABLE IF NOT EXISTS tarifa_regla (
                               id_tarifa   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                               nombre      VARCHAR(250),
                               descripcion TEXT,
-                              id_proveedor INT         NOT NULL,
+                              id_proveedor UUID         NOT NULL,
                               activo      BOOLEAN      NOT NULL DEFAULT TRUE,
 
                               CONSTRAINT fk_tarifaregla_proveedor FOREIGN KEY (id_proveedor) REFERENCES proveedor (id_proveedor)
@@ -167,13 +167,13 @@ CREATE TABLE tarifa_regla (
 -- TRAMO_TARIFA
 -- CHECK: tipo solo puede ser 'volumen' o 'costo'
 -- ------------------------------------------------------------
-CREATE TABLE tramo_tarifa (
+CREATE TABLE IF NOT EXISTS tramo_tarifa (
                               id_tramo         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                               tipo             VARCHAR(20)  NOT NULL,
                               cantidad_minima  DECIMAL(14,2) NOT NULL,
                               cantidad_maxima  DECIMAL(14,2),
                               porcentaje_desc  DECIMAL(14,2) NOT NULL,
-                              id_regla         INT          NOT NULL,
+                              id_regla         UUID          NOT NULL,
 
                               CONSTRAINT chk_tramo_tipo CHECK (tipo IN ('volumen', 'costo')),
                               CONSTRAINT fk_tramo_regla FOREIGN KEY (id_regla) REFERENCES tarifa_regla (id_tarifa)
@@ -182,14 +182,14 @@ CREATE TABLE tramo_tarifa (
 -- ------------------------------------------------------------
 -- PRECIO_BASE
 -- ------------------------------------------------------------
-CREATE TABLE precio_base (
+CREATE TABLE IF NOT EXISTS precio_base (
                              id_precio         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                              precio_base       DECIMAL(14,2) NOT NULL,
                              vigente_desde     TIMESTAMP     NOT NULL,
                              vigente_hasta     TIMESTAMP,
-                             id_proveedor      INT           NOT NULL,
+                             id_proveedor      UUID           NOT NULL,
                              sku               VARCHAR(100)  NOT NULL,
-                             id_regla_comision INT           NOT NULL,
+                             id_regla_comision UUID           NOT NULL,
 
                              CONSTRAINT fk_precio_proveedor FOREIGN KEY (id_proveedor)      REFERENCES proveedor (id_proveedor),
                              CONSTRAINT fk_precio_producto  FOREIGN KEY (sku)               REFERENCES producto (sku),
@@ -199,11 +199,11 @@ CREATE TABLE precio_base (
 -- ------------------------------------------------------------
 -- CONTRATO_EMPRESA_TARIFAS
 -- ------------------------------------------------------------
-CREATE TABLE contrato_empresa_tarifas (
+CREATE TABLE IF NOT EXISTS contrato_empresa_tarifas (
                                           id_contrato   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                                          id_empresa    INT       NOT NULL,
-                                          id_proveedor  INT       NOT NULL,
-                                          id_regla      INT       NOT NULL,
+                                          id_empresa    UUID       NOT NULL,
+                                          id_proveedor  UUID       NOT NULL,
+                                          id_regla      UUID       NOT NULL,
                                           vigente_desde TIMESTAMP NOT NULL,
                                           vigente_hasta TIMESTAMP,
                                           activo        BOOLEAN   NOT NULL DEFAULT TRUE,
@@ -216,11 +216,11 @@ CREATE TABLE contrato_empresa_tarifas (
 -- ------------------------------------------------------------
 -- CONTRATO_EMPRESA_DETALLE
 -- ------------------------------------------------------------
-CREATE TABLE contrato_empresa_detalle (
+CREATE TABLE IF NOT EXISTS contrato_empresa_detalle (
                                           id_detalle           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                           porcentaje_descuento DECIMAL(14,2) NOT NULL,
                                           sku                  VARCHAR(100),
-                                          id_contrato          INT           NOT NULL,
+                                          id_contrato          UUID           NOT NULL,
 
                                           CONSTRAINT fk_contdetalle_contrato FOREIGN KEY (id_contrato) REFERENCES contrato_empresa_tarifas (id_contrato),
                                           CONSTRAINT fk_contdetalle_producto FOREIGN KEY (sku)         REFERENCES producto (sku)
@@ -230,10 +230,10 @@ CREATE TABLE contrato_empresa_detalle (
 -- REGLAS_COMISION
 -- CHECK: id_tipo solo puede ser 'porcentaje' o 'fijo'
 -- ------------------------------------------------------------
-CREATE TABLE reglas_comision (
+CREATE TABLE IF NOT EXISTS reglas_comision (
                                  id_regla     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                  nombre       VARCHAR(150),
-                                 id_proveedor INT           NOT NULL,
+                                 id_proveedor UUID           NOT NULL,
                                  id_tipo      VARCHAR(20)   NOT NULL,
                                  valor        DECIMAL(14,2) NOT NULL,
                                  minimo_venta DECIMAL(14,2),
@@ -250,14 +250,14 @@ CREATE TABLE reglas_comision (
 -- ORDEN_COMPRA
 -- CHECK: id_estado solo puede ser 'pendiente','aprobado','cancelado','rechazado'
 -- ------------------------------------------------------------
-CREATE TABLE orden_compra (
+CREATE TABLE IF NOT EXISTS orden_compra (
                               id_orden              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                               total                 DECIMAL(14,2) NOT NULL,
                               fecha                 TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-                              id_proveedor          INT           NOT NULL,
-                              id_empresa_compradora INT           NOT NULL,
-                              id_sucursal           INT           NOT NULL,
-                              id_usuario            INT           NOT NULL,
+                              id_proveedor          UUID           NOT NULL,
+                              id_empresa_compradora UUID           NOT NULL,
+                              id_sucursal           UUID           NOT NULL,
+                              id_usuario            UUID           NOT NULL,
                               id_estado             VARCHAR(20)   NOT NULL DEFAULT 'pendiente',
 
                               CONSTRAINT chk_orden_estado CHECK (id_estado IN ('pendiente', 'aprobado', 'cancelado', 'rechazado')),
@@ -270,12 +270,12 @@ CREATE TABLE orden_compra (
 -- ------------------------------------------------------------
 -- DETALLE_ORDEN
 -- ------------------------------------------------------------
-CREATE TABLE detalle_orden (
+CREATE TABLE IF NOT EXISTS detalle_orden (
                                id_detalle      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                cantidad        INT           NOT NULL,
                                precio_unitario DECIMAL(14,2) NOT NULL,
                                subtotal        DECIMAL(14,2) NOT NULL,
-                               id_orden        INT           NOT NULL,
+                               id_orden        UUID           NOT NULL,
                                sku             VARCHAR(100)  NOT NULL,
 
                                CONSTRAINT fk_detorden_orden    FOREIGN KEY (id_orden) REFERENCES orden_compra (id_orden),
@@ -285,13 +285,13 @@ CREATE TABLE detalle_orden (
 -- ------------------------------------------------------------
 -- COMISION
 -- ------------------------------------------------------------
-CREATE TABLE comision (
+CREATE TABLE IF NOT EXISTS comision (
                           id_comision     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                           monto_comision  DECIMAL(14,2) NOT NULL,
                           monto_proveedor DECIMAL(14,2) NOT NULL,
                           fecha           TIMESTAMP     NOT NULL,
-                          id_detalle_orden INT          NOT NULL UNIQUE,
-                          id_proveedor    INT           NOT NULL,
+                          id_detalle_orden UUID          NOT NULL UNIQUE,
+                          id_proveedor    UUID           NOT NULL,
 
                           CONSTRAINT fk_comision_detalle   FOREIGN KEY (id_detalle_orden) REFERENCES detalle_orden (id_detalle),
                           CONSTRAINT fk_comision_proveedor FOREIGN KEY (id_proveedor)     REFERENCES proveedor (id_proveedor)
@@ -301,11 +301,11 @@ CREATE TABLE comision (
 -- FACTURA
 -- CHECK: id_estado solo puede ser 'pendiente','pagada','anulada'
 -- ------------------------------------------------------------
-CREATE TABLE factura (
+CREATE TABLE IF NOT EXISTS factura (
                          id_factura UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                          fecha      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
                          total      DECIMAL(14,2) NOT NULL,
-                         id_orden   INT           NOT NULL,
+                         id_orden   UUID           NOT NULL,
                          id_estado  VARCHAR(20)   NOT NULL DEFAULT 'pendiente',
 
                          CONSTRAINT chk_factura_estado CHECK (id_estado IN ('pendiente', 'pagada', 'anulada')),
@@ -315,12 +315,12 @@ CREATE TABLE factura (
 -- ------------------------------------------------------------
 -- DETALLE_FACTURA
 -- ------------------------------------------------------------
-CREATE TABLE detalle_factura (
+CREATE TABLE IF NOT EXISTS detalle_factura (
                                  id_detalle      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                  cantidad        INT           NOT NULL,
                                  precio_unitario DECIMAL(14,2) NOT NULL,
                                  subtotal        DECIMAL(14,2) NOT NULL,
-                                 id_factura      INT           NOT NULL,
+                                 id_factura      UUID           NOT NULL,
                                  sku             VARCHAR(100)  NOT NULL,
 
                                  CONSTRAINT fk_detfactura_factura  FOREIGN KEY (id_factura) REFERENCES factura (id_factura),
