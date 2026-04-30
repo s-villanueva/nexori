@@ -330,6 +330,9 @@ CREATE TABLE IF NOT EXISTS detalle_factura (
 ------------------------------
 -- INDICES
 ------------------------------
+-- empresa
+CREATE INDEX idx_nit_empresa    ON empresa (nit);
+
 -- contactos_empresa
 CREATE INDEX idx_contactos_empresa     ON contactos_empresa (id_empresa);
 CREATE INDEX idx_contactos_cargo       ON contactos_empresa (id_cargo_empresa);
