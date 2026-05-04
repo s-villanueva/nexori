@@ -282,6 +282,7 @@ CREATE TABLE IF NOT EXISTS orden_compra (
                               id_sucursal           UUID           NOT NULL,
                               id_usuario            UUID           NOT NULL,
                               id_estado             VARCHAR(20)   NOT NULL DEFAULT 'pendiente',
+                              fecha_orden           DATE,  
 
                               CONSTRAINT chk_orden_estado CHECK (id_estado IN ('pendiente', 'aprobado', 'cancelado', 'rechazado')),
                               CONSTRAINT fk_orden_proveedor FOREIGN KEY (id_proveedor)          REFERENCES proveedor (id_proveedor),
