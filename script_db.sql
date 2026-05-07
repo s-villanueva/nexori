@@ -299,11 +299,13 @@ CREATE TABLE IF NOT EXISTS detalle_orden (
                                cantidad        INT           NOT NULL,
                                precio_unitario DECIMAL(14,2) NOT NULL,
                                subtotal        DECIMAL(14,2) NOT NULL,
-                               id_orden        UUID           NOT NULL,
-                               sku             VARCHAR(100)  NOT NULL,
+                               id_orden        UUID          NOT NULL,
+                               sku             VARCHAR(100) NOT NULL,
+                               id_almacen      UUID          NOT NULL,
 
-                               CONSTRAINT fk_detorden_orden    FOREIGN KEY (id_orden) REFERENCES orden_compra (id_orden),
-                               CONSTRAINT fk_detorden_producto FOREIGN KEY (sku)      REFERENCES producto (sku)
+                               CONSTRAINT fk_detorden_orden    FOREIGN KEY (id_orden)   REFERENCES orden_compra (id_orden),
+                               CONSTRAINT fk_detorden_producto FOREIGN KEY (sku)        REFERENCES producto (sku),
+                               CONSTRAINT fk_detorden_almacen  FOREIGN KEY (id_almacen) REFERENCES almacen (id_almacen)
 );
 
 -- ------------------------------------------------------------
