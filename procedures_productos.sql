@@ -123,12 +123,3 @@ BEGIN
         P_PRECIO_BASE;
 END;
 $$ LANGUAGE plpgsql;
-
-
-CALL SP_AGREGAR_PRODUCTOS(
-        'Engrampadora',
-        'Engrampadora dorada',
-        'Unidad',
-        'Insumos de oficiNA',
-        'TS-002'
-     );
