@@ -419,8 +419,9 @@ CREATE INDEX idx_orden_estado                  ON orden_compra (id_estado);
 CREATE INDEX idx_orden_fecha                   ON orden_compra (fecha);
 
 -- detalle_orden
-CREATE INDEX idx_detorden_orden                ON detalle_orden (id_orden);
-CREATE INDEX idx_detorden_sku                  ON detalle_orden (sku);
+CREATE INDEX idx_detorden_orden   ON detalle_orden (id_orden);
+CREATE INDEX idx_detorden_sku     ON detalle_orden (sku);
+CREATE INDEX idx_detorden_almacen ON detalle_orden (id_almacen);
 
 -- comision
 CREATE INDEX idx_comision_proveedor            ON comision (id_proveedor);
