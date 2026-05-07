@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS comision (
                           id_regla_comision UUID NOT NULL,      
 
                           CONSTRAINT fk_comision_detalle   FOREIGN KEY (id_detalle_orden) REFERENCES detalle_orden (id_detalle),
-                          CONSTRAINT fk_comision_proveedor FOREIGN KEY (id_proveedor)     REFERENCES proveedor (id_proveedor)
+                          CONSTRAINT fk_comision_proveedor FOREIGN KEY (id_proveedor)     REFERENCES proveedor (id_proveedor),
                           CONSTRAINT fk_comision_regla      FOREIGN KEY (id_regla_comision) REFERENCES reglas_comision (id_regla)  
   );
 
