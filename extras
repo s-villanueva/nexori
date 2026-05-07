@@ -1,0 +1,17 @@
+--FUNCION PARA LLAMAR AL PROCEDURE PORQUE SUPA SOLO DETECTA FUNCIONES 
+CREATE OR REPLACE FUNCTION f_empresa_nueva(
+    p_empresa_datos JSONB,
+    p_empresa_contactos JSONB,
+    p_empresa_sucursales JSONB
+)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    CALL p_empresa_nueva(
+        p_empresa_datos,
+        p_empresa_contactos,
+        p_empresa_sucursales
+    );
+END;
+$$;
