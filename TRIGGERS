@@ -27,29 +27,74 @@ CREATE OR REPLACE TRIGGER trg_revertir_stock_orden
 -- ============================================================
 -- T3: Sin cambios — ninguna procedure aprueba órdenes.
 -- ============================================================
+-- ============================================================
+-- TRIGGER: generar factura automática al aprobar una orden
+-- ============================================================
+
 CREATE OR REPLACE FUNCTION fn_generar_factura()
-    RETURNS TRIGGER LANGUAGE plpgsql AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
 DECLARE
     v_id_factura UUID;
 BEGIN
-    IF NEW.id_estado = 'aprobado' AND OLD.id_estado <> 'aprobado' THEN
-        INSERT INTO factura (fecha, total, id_orden, id_estado)
-        VALUES (NOW(), NEW.total, NEW.id_orden, 'pendiente')
+    -- Solo cuando la orden cambia a aprobado
+    IF NEW.id_estado = 'aprobado'
+       AND OLD.id_estado <> 'aprobado' THEN
+
+        -- Evitar crear factura duplicada si por algún motivo ya existe
+        IF EXISTS (
+            SELECT 1
+            FROM factura
+            WHERE id_orden = NEW.id_orden
+        ) THEN
+            RETURN NEW;
+        END IF;
+
+        -- Crear factura pendiente
+        INSERT INTO factura (
+            fecha,
+            total,
+            id_orden,
+            id_estado
+        )
+        VALUES (
+            NOW(),
+            NEW.total,
+            NEW.id_orden,
+            'pendiente'
+        )
         RETURNING id_factura INTO v_id_factura;
 
-        INSERT INTO detalle_factura (cantidad, precio_unitario, subtotal, id_factura, sku)
-        SELECT cantidad, precio_unitario, subtotal, v_id_factura, sku
-        FROM   detalle_orden
-        WHERE  id_orden = NEW.id_orden;
+        -- Copiar productos de la orden a detalle_factura
+        INSERT INTO detalle_factura (
+            cantidad,
+            precio_unitario,
+            subtotal,
+            id_factura,
+            sku
+        )
+        SELECT
+            cantidad,
+            precio_unitario,
+            subtotal,
+            v_id_factura,
+            sku
+        FROM detalle_orden
+        WHERE id_orden = NEW.id_orden;
+
     END IF;
+
     RETURN NEW;
 END;
 $$;
 
-CREATE OR REPLACE TRIGGER trg_generar_factura
-    AFTER UPDATE OF id_estado ON orden_compra
-    FOR EACH ROW EXECUTE FUNCTION fn_generar_factura();
+DROP TRIGGER IF EXISTS trg_generar_factura ON orden_compra;
 
+CREATE TRIGGER trg_generar_factura
+AFTER UPDATE OF id_estado ON orden_compra
+FOR EACH ROW
+EXECUTE FUNCTION fn_generar_factura();
 
 -- ============================================================
 -- T4: Sin cambios — ninguna procedure anula facturas.
