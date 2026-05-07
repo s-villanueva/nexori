@@ -2,6 +2,7 @@ CREATE OR REPLACE PROCEDURE SP_AGREGAR_ORDEN_COMPRA (
     P_NOMBRE_EMPRESA_COMPRADORA VARCHAR,
     P_NOMBRE_EMPRESA_PROVEEDORA VARCHAR,
     P_NOMBRE_SUCURSAL VARCHAR,
+    P_NOMBRE_ALMACEN VARCHAR,
     P_NOMBRE_USUARIO VARCHAR,
     P_PRODUCTOS_LISTA JSONB
 )
@@ -12,6 +13,7 @@ DECLARE
     V_ID_EMPRESA_PROVEEDORA UUID;
     V_ID_EMPRESA_COMPRADORA UUID;
     V_ID_SUCURSAL UUID;
+    V_ID_ALMACEN UUID;
     V_ID_USUARIO UUID;
     V_ID_ORDEN_NUEVA UUID;
     V_TOTAL DECIMAL(14,2);
@@ -56,6 +58,16 @@ BEGIN
         RAISE EXCEPTION 'La sucursal % no existe o no pertenece a la empresa compradora %',
             P_NOMBRE_SUCURSAL,
             P_NOMBRE_EMPRESA_COMPRADORA;
+    END IF;
+
+    SELECT id_almacen INTO V_ID_ALMACEN
+        FROM almacen a
+    INNER JOIN proveedor p2
+        ON a.id_proveedor = p2.id_proveedor
+    WHERE a.nombre = P_NOMBRE_ALMACEN;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'El almacen % no existe.', P_NOMBRE_ALMACEN;
     END IF;
 
     SELECT u.id_usuario
@@ -190,14 +202,16 @@ BEGIN
         precio_unitario,
         subtotal,
         id_orden,
-        sku
+        sku,
+        id_almacen
     )
     SELECT
         productos_pedidos.cantidad,
         pb.precio_base,
         productos_pedidos.cantidad * pb.precio_base,
         V_ID_ORDEN_NUEVA,
-        productos_pedidos.sku
+        productos_pedidos.sku,
+        V_ID_SUCURSAL
     FROM (
              SELECT
                  producto->>'sku' AS sku,
