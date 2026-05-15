@@ -179,7 +179,9 @@ CREATE TABLE IF NOT EXISTS producto (
                           unidad_medida VARCHAR(50),
                           activo        BOOLEAN      NOT NULL DEFAULT TRUE,
                           id_categoria  UUID,
+                          id_proveedor  UUID,
 
+                          CONSTRAINT fk_producto_proveedor FOREIGN KEY (id_proveedor) REFERENCES proveedor (id_proveedor),
                           CONSTRAINT fk_producto_categoria FOREIGN KEY (id_categoria) REFERENCES categoria (id_categoria)
 );
 
@@ -469,4 +471,3 @@ CREATE INDEX idx_factura_estado                ON factura (id_estado);
 -- detalle_factura
 CREATE INDEX idx_detfactura_factura            ON detalle_factura (id_factura);
 CREATE INDEX idx_detfactura_id_producto                ON detalle_factura (id_producto);
-
