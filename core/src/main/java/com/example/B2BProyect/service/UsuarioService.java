@@ -3,6 +3,7 @@ package com.example.B2BProyect.service;
 import com.example.B2BProyect.repository.UsuarioRepository;
 import com.example.B2BProyect.repository.entity.Usuario;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UsuarioService {
@@ -42,5 +44,9 @@ public class UsuarioService {
             if (changes.getIdRol() != null) usuario.setIdRol(changes.getIdRol());
             return usuarioRepository.save(usuario);
         });
+    }
+    @Transactional(readOnly = true)
+    public Optional<Usuario> findByNombre(String nombre) {
+        return this.usuarioRepository.findByNombre(nombre);
     }
 }

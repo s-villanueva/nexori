@@ -1,8 +1,7 @@
 package com.example.B2BProyect.repository.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.LinkedHashSet;
@@ -15,6 +14,9 @@ import java.util.UUID;
 @Table(name = "rol_usuario", uniqueConstraints = {
         @UniqueConstraint(name = "rol_usuario_nombre_key", columnNames = {"nombre"})
 })
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RolUsuario {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

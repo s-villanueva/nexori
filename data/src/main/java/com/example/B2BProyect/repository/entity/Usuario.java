@@ -2,13 +2,14 @@ package com.example.B2BProyect.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -20,6 +21,9 @@ import java.util.UUID;
 }, uniqueConstraints = {
         @UniqueConstraint(name = "usuario_email_key", columnNames = {"email"})
 })
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -58,4 +62,9 @@ public class Usuario {
     @OneToMany(mappedBy = "idUsuario")
     private Set<OrdenCompra> ordenCompras = new LinkedHashSet<>();
 
+    public Usuario(UUID id, String nombre, RolUsuario role) {
+        this.id = id;
+        this.nombre = nombre;
+        this.idRol = role;
+    }
 }

@@ -3,6 +3,7 @@ package com.example.B2BProyect.repository;
 import com.example.B2BProyect.repository.dto.response.UsuarioDTO;
 import com.example.B2BProyect.repository.entity.Usuario;
 import com.example.B2BProyect.repository.proyecciones.UsuarioProjection;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,7 +37,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
             " FROM Usuario u WHERE u.id = :pId")
     Optional<UsuarioDTO> findByIdDTO(@Param("pId") UUID pId);
 
-    // proyección para autenticación y sesión
     @Query("SELECT u.id AS id, u.nombre AS nombre, u.email AS email, u.activo AS activo FROM Usuario u")
     List<UsuarioProjection> findResumenUsuarios();
+
+    @Override
+    @EntityGraph(attributePaths = {"idRol"})
+    Optional<Usuario> findById(UUID id);
+
+    @EntityGraph(attributePaths = {"idRol"})
+    Optional<Usuario> findByNombre(String nombre);
 }

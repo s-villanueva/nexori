@@ -1,18 +1,18 @@
-package com.example.B2BProyect;
+package com.example.ExamenUno;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.web.config.SpringDataWebSettings;
 
 @SpringBootApplication
-public class B2BProyectApplication implements CommandLineRunner {
+public class ExamenUnoApplication implements CommandLineRunner {
 	@Autowired
     private SpringDataWebSettings springDataWebSettings;
 
 	public static void main(String[] args) {
-		SpringApplication.run(B2BProyectApplication.class, args);
+		SpringApplication.run(ExamenUnoApplication.class, args);
 
 		System.out.println("Hola mundo");
 	}
