@@ -15,6 +15,7 @@ import TarifasProducto from './Pages/TarifasProducto'
 import ReglasTarifa from './Pages/ReglasTarifa'
 import Productos from './Pages/Productos'
 import Stock from './Pages/Stock'
+import PreciosBase from './Pages/PreciosBase'
 
 function ProtectedRoutes() {
   const { session } = useAuth()
@@ -37,6 +38,7 @@ function ProtectedRoutes() {
         <Route path="/productos" element={<Productos />} />
         <Route path="/reglas-tarifa" element={<ReglasTarifa />} />
         <Route path="/stock" element={<Stock />} />
+        <Route path="/precios" element={<PreciosBase />} />
         <Route path="/comisiones" element={<VistaPage tipo="comisiones" />} />
         <Route path="/resumen" element={<VistaPage tipo="resumen" />} />
         <Route path="/proveedores" element={<VistaPage tipo="proveedores" />} />

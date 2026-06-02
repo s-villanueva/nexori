@@ -4,11 +4,13 @@ import PageHeader from '../components/PageHeader'
 import { useAuth } from '../AuthContext'
 
 const emptyForm = { idProducto: '', stock: '', min: '', max: '', activo: true }
+const emptyAlmacenForm = { nombre: '', direccion: '', activo: true }
 
 export default function Stock() {
   const { session } = useAuth()
 
   const [almacen, setAlmacen] = useState(null)
+  const [idProveedorActual, setIdProveedorActual] = useState(null)
   const [inventario, setInventario] = useState([])
   const [productosDisponibles, setProductosDisponibles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -17,6 +19,7 @@ export default function Stock() {
   const [deletingKey, setDeletingKey] = useState(null)
   const [createForm, setCreateForm] = useState(emptyForm)
   const [editModal, setEditModal] = useState({ open: false, idAlmacen: null, idProducto: null, form: emptyForm })
+  const [almacenModal, setAlmacenModal] = useState({ open: false, form: emptyAlmacenForm })
 
   const showMsg = (text, ok = true) => setMsg({ text, ok })
 
@@ -36,8 +39,8 @@ export default function Stock() {
         return
       }
 
-      const empresaNombre = prov.idEmpresa?.nombre
-      const alm = (almData || []).find(a => a.nombreProveedor === empresaNombre)
+      setIdProveedorActual(prov.id)
+      const alm = (almData || []).find(a => a.idProveedor?.id === prov.id)
       if (!alm) {
         showMsg('Tu empresa no tiene un almacén registrado.', false)
         setLoading(false)
@@ -137,6 +140,33 @@ export default function Stock() {
       },
     })
 
+  const crearAlmacen = async () => {
+    const { form } = almacenModal
+    if (!form.nombre) {
+      showMsg('El nombre del almacén es obligatorio.', false)
+      return
+    }
+    if (!idProveedorActual) {
+      showMsg('No se pudo detectar tu proveedor.', false)
+      return
+    }
+    setSaving(true)
+    try {
+      await api.post('/api/v1/almacenes', {
+        nombre: form.nombre,
+        direccion: form.direccion,
+        activo: form.activo,
+        idProveedor: idProveedorActual,
+      })
+      showMsg('Almacén registrado correctamente.')
+      setAlmacenModal({ open: false, form: emptyAlmacenForm })
+      await cargarDatos()
+    } catch (e) {
+      showMsg(`Error creando almacén: ${e.message}`, false)
+    }
+    setSaving(false)
+  }
+
   const deletingKeyStr = (idAlmacen, idProducto) => `${idAlmacen}-${idProducto}`
 
   return (
@@ -144,7 +174,12 @@ export default function Stock() {
       <PageHeader
         title="Stock de almacenes"
         subtitle={almacen ? `Almacén: ${almacen.nombre}${almacen.direccion ? ` · ${almacen.direccion}` : ''}` : 'Cargando almacén...'}
-        action={<button onClick={() => cargarDatos(almacen?.id)} style={styles.refreshBtn}>↺ Actualizar</button>}
+        action={
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => setAlmacenModal({ open: true, form: emptyAlmacenForm })} style={styles.newBtn}>+ Nuevo almacén</button>
+            <button onClick={() => cargarDatos(almacen?.id)} style={styles.refreshBtn}>↺ Actualizar</button>
+          </div>
+        }
       />
 
       {msg.text && (
@@ -266,6 +301,44 @@ export default function Stock() {
         )}
       </div>
 
+      {/* Modal nuevo almacén */}
+      {almacenModal.open && (
+        <div style={styles.overlay} onClick={() => setAlmacenModal({ open: false, form: emptyAlmacenForm })}>
+          <div style={styles.modal} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 1rem', fontSize: '16px', color: '#0f172a' }}>Registrar nuevo almacén</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={styles.label}>Nombre <span style={{ color: '#dc2626' }}>*</span></label>
+                <input style={styles.input} value={almacenModal.form.nombre}
+                  onChange={e => setAlmacenModal({ ...almacenModal, form: { ...almacenModal.form, nombre: e.target.value } })}
+                  placeholder="Ej: Almacén Central" />
+              </div>
+              <div>
+                <label style={styles.label}>Dirección</label>
+                <input style={styles.input} value={almacenModal.form.direccion}
+                  onChange={e => setAlmacenModal({ ...almacenModal, form: { ...almacenModal.form, direccion: e.target.value } })}
+                  placeholder="Ej: Av. Principal 123" />
+              </div>
+              <div>
+                <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={almacenModal.form.activo}
+                    onChange={e => setAlmacenModal({ ...almacenModal, form: { ...almacenModal.form, activo: e.target.checked } })} />
+                  Activo
+                </label>
+              </div>
+            </div>
+            <div style={styles.actions}>
+              <button style={styles.clearBtn}
+                onClick={() => setAlmacenModal({ open: false, form: emptyAlmacenForm })}
+                disabled={saving}>Cancelar</button>
+              <button style={styles.saveBtn} onClick={crearAlmacen} disabled={saving}>
+                {saving ? 'Guardando...' : 'Registrar almacén'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal editar stock */}
       {editModal.open && (
         <div style={styles.overlay} onClick={() => setEditModal({ open: false, idAlmacen: null, idProducto: null, form: emptyForm })}>
@@ -313,6 +386,7 @@ export default function Stock() {
 }
 
 const styles = {
+  newBtn: { background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
   refreshBtn: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#475569' },
   msg: { border: '1px solid', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', fontSize: '13px' },
   card: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' },

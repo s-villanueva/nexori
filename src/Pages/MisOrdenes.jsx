@@ -21,7 +21,7 @@ export default function MisOrdenes() {
 
   const [mostrarForm, setMostrarForm] = useState(false)
   const [guardandoOrden, setGuardandoOrden] = useState(false)
-  const [qrModal, setQrModal] = useState({ open: false, qrBase64: null, ordenId: null, loading: false })
+  const [qrModal, setQrModal] = useState({ open: false, qrBase64: null, ordenId: null, loading: false, amount: null })
 
   const [skuBusqueda, setSkuBusqueda] = useState('')
   const [buscandoSku, setBuscandoSku] = useState(false)
@@ -259,7 +259,9 @@ export default function MisOrdenes() {
     if (productosOrden.length === 0) { showToast('Agrega al menos un producto.', 'error'); return }
 
     const primer = productosOrden[0]
-    const total = productosOrden.reduce((sum, p) => sum + (p.precioFinal ?? p.precioBase ?? 0) * p.cantidad, 0)
+    const total = Math.round(
+      productosOrden.reduce((sum, p) => sum + (p.precioFinal ?? p.precioBase ?? 0) * p.cantidad, 0) * 100
+    ) / 100
     setGuardandoOrden(true)
     try {
       const orden = await api.post('/api/v1/ordenes-compra', {
@@ -291,14 +293,15 @@ export default function MisOrdenes() {
     setGuardandoOrden(false)
   }
 
-  const cerrarQr = () => setQrModal({ open: false, qrBase64: null, ordenId: null, loading: false })
+  const cerrarQr = () => setQrModal({ open: false, qrBase64: null, ordenId: null, loading: false, amount: null })
 
   const abrirQR = async (orden) => {
     const raw = rawOrdenes.find(o => o.id === orden.id_orden)
-    setQrModal({ open: true, qrBase64: null, ordenId: orden.id_orden, loading: true })
+    const amount = raw?.total ?? orden.total
+    setQrModal({ open: true, qrBase64: null, ordenId: orden.id_orden, loading: true, amount })
     try {
       const res = await api.post('/api/v1/stereum/charge', {
-        amount: raw?.total ?? orden.total,
+        amount,
         orderId: orden.id_orden,
       })
       setQrModal(prev => ({ ...prev, qrBase64: res?.qr_base64 ?? null, loading: false }))
@@ -461,21 +464,40 @@ export default function MisOrdenes() {
             {productosOrden.length > 0 && (
               <div style={styles.orderList}>
                 <p style={styles.sectionTitle}>Productos en la orden</p>
-                {productosOrden.map(p => (
-                  <div key={p.idProducto} style={styles.orderItem}>
-                    <div>
-                      <strong>{p.sku}</strong> — {p.nombre}
-                      <br />
-                      <span>Cantidad: {p.cantidad} | Proveedor: {p.nombreProveedor} | Almacén: {p.nombreAlmacen}</span>
-                      {p.precioFinal != null && (
-                        <span style={{ marginLeft: '8px', color: '#166534', fontWeight: '600' }}>
-                          · {formatBOB(p.precioFinal)}/u {p.descuentoTotal > 0 ? `(−${p.descuentoTotal}%)` : ''}
+                {productosOrden.map(p => {
+                  const precioUnit = p.precioFinal ?? p.precioBase ?? null
+                  const subtotal = precioUnit != null ? precioUnit * p.cantidad : null
+                  return (
+                    <div key={p.idProducto} style={styles.orderItem}>
+                      <div>
+                        <strong>{p.sku}</strong> — {p.nombre}
+                        <br />
+                        <span style={{ fontSize: '12px', color: '#64748b' }}>
+                          Cant: {p.cantidad} · {p.nombreProveedor} · {p.nombreAlmacen}
                         </span>
-                      )}
+                        {precioUnit != null && (
+                          <span style={{ display: 'block', fontSize: '12px', color: '#166534', fontWeight: '600', marginTop: '2px' }}>
+                            {formatBOB(precioUnit)}/u
+                            {p.descuentoTotal > 0 && <span style={{ color: '#16a34a' }}> (−{p.descuentoTotal}%)</span>}
+                            {subtotal != null && <span style={{ color: '#0f172a', marginLeft: '8px' }}>= {formatBOB(subtotal)}</span>}
+                          </span>
+                        )}
+                        {precioUnit == null && (
+                          <span style={{ display: 'block', fontSize: '12px', color: '#f59e0b', marginTop: '2px' }}>Sin precio configurado</span>
+                        )}
+                      </div>
+                      <button style={styles.removeBtn} onClick={() => quitarProductoDeOrden(p.idProducto)}>Quitar</button>
                     </div>
-                    <button style={styles.removeBtn} onClick={() => quitarProductoDeOrden(p.idProducto)}>Quitar</button>
-                  </div>
-                ))}
+                  )
+                })}
+
+                {/* Total de la orden */}
+                <div style={{ marginTop: '12px', padding: '12px 14px', background: '#f0fdf4', borderRadius: '10px', border: '1px solid #bbf7d0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '700', fontSize: '14px', color: '#166534' }}>Total de la orden</span>
+                  <span style={{ fontWeight: '800', fontSize: '18px', color: '#166534' }}>
+                    {formatBOB(productosOrden.reduce((sum, p) => sum + (p.precioFinal ?? p.precioBase ?? 0) * p.cantidad, 0))}
+                  </span>
+                </div>
               </div>
             )}
 
@@ -509,8 +531,14 @@ export default function MisOrdenes() {
                 <img
                   src={`data:image/jpeg;base64,${qrModal.qrBase64}`}
                   alt="QR de pago"
-                  style={{ width: '220px', height: '220px', margin: '0 auto 1rem', display: 'block', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  style={{ width: '220px', height: '220px', margin: '0 auto 0.75rem', display: 'block', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                 />
+                {qrModal.amount != null && (
+                  <div style={{ margin: '0 auto 1rem', textAlign: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '2px' }}>Monto a pagar</span>
+                    <span style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a' }}>{formatBOB(qrModal.amount)}</span>
+                  </div>
+                )}
                 <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '1.5rem' }}>Escaneá el QR y luego confirmá el pago</p>
                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <button style={styles.cancelBtn} onClick={cerrarQr}>Cancelar</button>

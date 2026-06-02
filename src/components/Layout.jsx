@@ -10,6 +10,7 @@ const proveedorLinks = [
   { to: '/procedures', icon: '⚙️', label: 'Procedures'       },
    { to: '/reglas-tarifa', icon: '⚖️', label: 'Reglas de tarifa' },
    { to: '/productos', icon: '🛍️', label: 'Productos'        },
+   { to: '/precios',   icon: '💲', label: 'Precios base'     },
 ]
 
 const empresaLinks = [
