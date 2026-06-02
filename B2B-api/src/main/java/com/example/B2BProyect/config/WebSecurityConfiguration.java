@@ -116,6 +116,8 @@ public class WebSecurityConfiguration implements WebMvcConfigurer, Serializable 
 //                                        .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/**").permitAll()
 
                                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                                        .requestMatchers("/api/pagos/**").permitAll()
+                                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                                         .requestMatchers("/error").anonymous() // <----- Fix
                                         .anyRequest().authenticated()
@@ -135,6 +137,9 @@ public class WebSecurityConfiguration implements WebMvcConfigurer, Serializable 
 
     private CorsConfigurationSource apiConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
