@@ -15,7 +15,6 @@ const proveedorLinks = [
 const empresaLinks = [
   { to: '/dashboard',           icon: '▦',  label: 'Dashboard'           },
   { to: '/mis-ordenes',         icon: '📦', label: 'Mis órdenes'         },
-  { to: '/productos',           icon: '🛍️', label: 'Productos'           },
   { to: '/facturas',            icon: '🧾', label: 'Facturas pendientes' },
   { to: '/contratos',           icon: '📄', label: 'Contratos'           },
   { to: '/resumen',             icon: '📊', label: 'Resumen de compras'  },

@@ -85,6 +85,7 @@ export default function Registro() {
       await api.post('/api/v1/usuarios', {
         nombre: usuario.nombre,
         email: usuario.email,
+        password: usuario.password,
         activo: true,
         idEmpresa: empresaCreada.id,
         idSucursal: sucursalCreada.id,

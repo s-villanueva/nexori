@@ -21,6 +21,7 @@ export default function MisOrdenes() {
 
   const [mostrarForm, setMostrarForm] = useState(false)
   const [guardandoOrden, setGuardandoOrden] = useState(false)
+  const [qrModal, setQrModal] = useState({ open: false, qrBase64: null, ordenId: null, loading: false })
 
   const [skuBusqueda, setSkuBusqueda] = useState('')
   const [buscandoSku, setBuscandoSku] = useState(false)
@@ -290,6 +291,29 @@ export default function MisOrdenes() {
     setGuardandoOrden(false)
   }
 
+  const cerrarQr = () => setQrModal({ open: false, qrBase64: null, ordenId: null, loading: false })
+
+  const abrirQR = async (orden) => {
+    const raw = rawOrdenes.find(o => o.id === orden.id_orden)
+    setQrModal({ open: true, qrBase64: null, ordenId: orden.id_orden, loading: true })
+    try {
+      const res = await api.post('/api/v1/stereum/charge', {
+        amount: raw?.total ?? orden.total,
+        orderId: orden.id_orden,
+      })
+      setQrModal(prev => ({ ...prev, qrBase64: res?.qr_base64 ?? null, loading: false }))
+    } catch (e) {
+      showToast(`Error generando QR: ${e.message}`, 'error')
+      cerrarQr()
+    }
+  }
+
+  const pagoCompletado = async () => {
+    const { ordenId } = qrModal
+    cerrarQr()
+    await cambiarEstado(ordenId, 'aprobado', 'Pago QR completado. Trigger T3: factura generada.')
+  }
+
   const formatBOB = (val) => Number(val).toLocaleString('es-BO', { style: 'currency', currency: 'BOB' })
 
   return (
@@ -474,6 +498,37 @@ export default function MisOrdenes() {
         </div>
       </div>
 
+      {qrModal.open && (
+        <div style={styles.modalOverlay}>
+          <div style={{ ...styles.modal, maxWidth: '380px', textAlign: 'center' }}>
+            <p style={{ margin: '0 0 1.25rem', fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>Pago con QR</p>
+            {qrModal.loading ? (
+              <p style={{ color: '#64748b', margin: '2rem 0' }}>Generando QR...</p>
+            ) : qrModal.qrBase64 ? (
+              <>
+                <img
+                  src={`data:image/jpeg;base64,${qrModal.qrBase64}`}
+                  alt="QR de pago"
+                  style={{ width: '220px', height: '220px', margin: '0 auto 1rem', display: 'block', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                />
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '1.5rem' }}>Escaneá el QR y luego confirmá el pago</p>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                  <button style={styles.cancelBtn} onClick={cerrarQr}>Cancelar</button>
+                  <button style={{ ...styles.saveBtn, background: '#16a34a' }} onClick={pagoCompletado}>
+                    Pago completado
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p style={{ color: '#dc2626', marginBottom: '1rem' }}>No se pudo generar el QR.</p>
+                <button style={styles.cancelBtn} onClick={cerrarQr}>Cerrar</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <p style={{ color: '#94a3b8' }}>Cargando órdenes...</p>
       ) : ordenes.length === 0 ? (
@@ -514,6 +569,11 @@ export default function MisOrdenes() {
                             <button disabled={procesando === o.id_orden} onClick={() => cambiarEstado(o.id_orden, 'rechazado', 'Orden rechazada.')}
                               style={{ ...styles.actionBtn, background: '#f1f5f9', color: '#475569' }}>Rechazar</button>
                           </>
+                        )}
+                        {session?.rol !== 'proveedor' && o.estado_orden === 'pendiente' && (
+                          <button disabled={procesando === o.id_orden}
+                            onClick={() => abrirQR(o)}
+                            style={{ ...styles.actionBtn, background: '#eff6ff', color: '#1e40af' }}>Pagar QR</button>
                         )}
                         {session?.rol !== 'proveedor' && (o.estado_orden === 'pendiente' || o.estado_orden === 'aprobado') && (
                           <button disabled={procesando === o.id_orden}

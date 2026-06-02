@@ -14,6 +14,7 @@ import Contratos from './Pages/Contratos'
 import TarifasProducto from './Pages/TarifasProducto'
 import ReglasTarifa from './Pages/ReglasTarifa'
 import Productos from './Pages/Productos'
+import Stock from './Pages/Stock'
 
 function ProtectedRoutes() {
   const { session } = useAuth()
@@ -33,18 +34,10 @@ function ProtectedRoutes() {
         <Route path="/contratos" element={<Contratos />} />
         <Route path="/facturas" element={<Facturas />} />
         <Route path="/tarifas-producto" element={<TarifasProducto />} />
-
         <Route path="/productos" element={<Productos />} />
-
-        {/* Vistas proveedor */}
-        <Route path="/stock" element={<VistaPage tipo="stock" />} />
-        <Route path="/comisiones" element={<VistaPage tipo="comisiones" />} />
-        <Route path="/contratos" element={<VistaPage tipo="contratos" />} />
         <Route path="/reglas-tarifa" element={<ReglasTarifa />} />
-
-        {/* Vistas empresa compradora */}
-        <Route path="/facturas" element={<VistaPage tipo="facturas" />} />
-        <Route path="/productos" element={<VistaPage tipo="productos" />} />
+        <Route path="/stock" element={<Stock />} />
+        <Route path="/comisiones" element={<VistaPage tipo="comisiones" />} />
         <Route path="/resumen" element={<VistaPage tipo="resumen" />} />
         <Route path="/proveedores" element={<VistaPage tipo="proveedores" />} />
 
