@@ -26,24 +26,23 @@ public class SistemaA {
     @Value("${sistemaB2B.read-timeout:40000}")
     private int readTimeout;
 
-    public Sistema1AuthResponse auth(Sistema1AuthRequest request) throws Exception {
+    public JSONObject auth(Sistema1AuthRequest request) throws Exception {
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("email", request.getEmail()); // Assuming getEmail() exists
-        jsonObject.put("password", request.getPasswordHash());
+        JSONObject body = new JSONObject();
+        body.put("email", request.getEmail());
+        body.put("passwordHash", request.getPasswordHash());
 
         RestClient restClient = create();
 
-        ResponseEntity<Sistema1AuthResponse> response;
+        ResponseEntity<String> response;
         try {
             response = restClient.post()
                     .uri(urlBase + "/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-//                    .body(request)
-                    .body(jsonObject.toString())
+                    .body(body.toString())
                     .retrieve()
-                    .toEntity(Sistema1AuthResponse.class);
+                    .toEntity(String.class);
         } catch (Exception e) {
             log.error("Error calling auth on Sistema1. ", e);
             throw e;
@@ -54,7 +53,7 @@ public class SistemaA {
             throw new Exception("Auth failed on Sistema1");
         }
 
-        return response.getBody();
+        return new JSONObject(response.getBody());
     }
 
 
@@ -94,11 +93,11 @@ public class SistemaA {
 
     private String fetchToken() throws Exception {
         Sistema1AuthRequest req = new Sistema1AuthRequest(authEmail, authPassword);
-        Sistema1AuthResponse res = auth(req);
-        log.info("Sistema1 JWT obtained: {}", res.getAccessToken());
-        JSONObject jsonObject = new JSONObject();
-        log.info("Sistema1 JWT MANUALLY obtained: {}", jsonObject.getString("access_token"));
-        return res.getAccessToken();
+        JSONObject authResponse = auth(req);
+        log.info("Sistema1 auth response: {}", authResponse);
+        String token = authResponse.getString("access_token");
+        log.info("Sistema1 JWT obtained: {}", token);
+        return token;
     }
 
 
