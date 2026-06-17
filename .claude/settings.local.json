@@ -4,7 +4,13 @@
       "Bash(dir C:\\\\Universidad\\\\Semestre VII\\\\Bases De Datos Avanzadas\\\\MARKETPLACE_B2B\\\\frontend-b2b\\\\src\\\\Pages *)",
       "Bash(npm install *)",
       "Bash(npm run *)",
-      "Bash(timeout 4)"
+      "Bash(timeout 4)",
+      "Bash(cd \"C:\\\\Universidad\\\\Semestre VII\\\\Certificacion III - Springboot\\\\B2B-Proyecto\" && find . -type f -name \"*.java\" -path \"*/entity/*\" | grep -i \"empresa\\\\|proveedor\")",
+      "Read(//c/Universidad/Semestre VII/Certificacion III - Springboot/B2B-Proyecto/**)",
+      "Bash(xargs grep -l \"solicitud\\\\|verificacion\\\\|application\" -i)",
+      "Bash(xargs grep -l \"class.*Solicitud\\\\|class.*Verificacion\")",
+      "Bash(xargs grep -l \"verificacion\\\\|solicitud\\\\|approval\\\\|application\" -i)",
+      "Bash(xargs -I {} basename {})"
     ]
   }
 }

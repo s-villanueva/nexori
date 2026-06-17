@@ -222,17 +222,17 @@ export default function PreciosBase() {
               {precios.map((p, i) => {
                 const vigente = esVigente(p)
                 return (
-                  <tr key={p.id} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                  <tr key={p.id} style={{ background: i % 2 === 0 ? '#fff' : '#F7F8FC' }}>
                     <td style={styles.td}>{p.idProducto?.nombre || p.nombreProducto || '—'}</td>
                     <td style={styles.td}>{p.idProducto?.sku || '—'}</td>
-                    <td style={{ ...styles.td, fontWeight: '700', color: '#0f172a' }}>{formatBOB(p.precioBase)}</td>
+                    <td style={{ ...styles.td, fontWeight: '700', color: '#1A1D3B' }}>{formatBOB(p.precioBase)}</td>
                     <td style={styles.td}>{formatFecha(p.vigenteDesde)}</td>
                     <td style={styles.td}>{formatFecha(p.vigenteHasta)}</td>
                     <td style={styles.td}>
                       <span style={{
                         padding: '3px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: '600',
-                        background: vigente ? '#dcfce7' : '#f1f5f9',
-                        color: vigente ? '#166534' : '#64748b',
+                        background: vigente ? '#dcfce7' : '#EEF1FB',
+                        color: vigente ? '#166534' : '#9599AE',
                       }}>
                         {vigente ? 'Vigente' : 'Inactivo'}
                       </span>
@@ -240,7 +240,7 @@ export default function PreciosBase() {
                     <td style={styles.td}>
                       {deletingId === p.id ? (
                         <span style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '12px', color: '#64748b' }}>¿Eliminar?</span>
+                          <span style={{ fontSize: '12px', color: '#9599AE' }}>¿Eliminar?</span>
                           <button style={styles.btnDanger} onClick={() => eliminar(p.id)}>Sí</button>
                           <button style={styles.btnGhost} onClick={() => setDeletingId(null)}>No</button>
                         </span>
@@ -263,7 +263,7 @@ export default function PreciosBase() {
       {editModal.open && (
         <div style={styles.overlay} onClick={() => setEditModal({ open: false, id: null, form: emptyForm })}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 1rem', fontSize: '16px', color: '#0f172a' }}>Editar precio</h3>
+            <h3 style={{ margin: '0 0 1rem', fontSize: '16px', color: '#1A1D3B' }}>Editar precio</h3>
             <div style={styles.grid}>
               <div style={styles.full}>
                 <label style={styles.label}>Producto</label>
@@ -307,28 +307,28 @@ export default function PreciosBase() {
 }
 
 const styles = {
-  refreshBtn: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#475569' },
+  refreshBtn: { background: '#fff', border: '1px solid #DDE0EE', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#9599AE' },
   msg: { border: '1px solid', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', fontSize: '13px' },
-  card: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' },
-  cardTitle: { margin: '0 0 1rem', fontSize: '16px', color: '#0f172a' },
+  card: { background: '#fff', border: '1px solid #DDE0EE', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' },
+  cardTitle: { margin: '0 0 1rem', fontSize: '16px', color: '#1A1D3B' },
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' },
   full: { gridColumn: '1 / -1' },
-  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' },
-  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', background: '#fff', color: '#0f172a', outline: 'none' },
+  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#9599AE', marginBottom: '6px' },
+  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', background: '#fff', color: '#1A1D3B', outline: 'none' },
   actions: { marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '8px' },
-  clearBtn: { padding: '10px 16px', background: '#fff', color: '#475569', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
-  saveBtn: { padding: '10px 16px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
-  tableWrapper: { overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '10px', background: '#fff' },
+  clearBtn: { padding: '10px 16px', background: '#fff', color: '#9599AE', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  saveBtn: { padding: '10px 16px', background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  tableWrapper: { overflowX: 'auto', border: '1px solid #DDE0EE', borderRadius: '10px', background: '#fff' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
-  th: { padding: '10px 14px', background: '#f1f5f9', color: '#475569', fontWeight: '600', textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid #e2e8f0' },
-  td: { padding: '9px 14px', color: '#334155', borderBottom: '1px solid #f1f5f9', whiteSpace: 'nowrap' },
-  empty: { display: 'flex', alignItems: 'center', gap: '10px', padding: '2rem', color: '#94a3b8', fontSize: '14px' },
-  emptyText: { color: '#94a3b8', padding: '1.5rem', fontSize: '14px', margin: 0 },
-  spinner: { width: '16px', height: '16px', border: '2px solid #e2e8f0', borderTop: '2px solid #3b82f6', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
-  btnEdit: { padding: '5px 12px', fontSize: '12px', fontWeight: '600', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer' },
+  th: { padding: '10px 14px', background: '#EEF1FB', color: '#06175D', fontWeight: '700', textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid #DDE0EE' },
+  td: { padding: '9px 14px', color: '#1A1D3B', borderBottom: '1px solid #F0F2FA', whiteSpace: 'nowrap' },
+  empty: { display: 'flex', alignItems: 'center', gap: '10px', padding: '2rem', color: '#9599AE', fontSize: '14px' },
+  emptyText: { color: '#9599AE', padding: '1.5rem', fontSize: '14px', margin: 0 },
+  spinner: { width: '16px', height: '16px', border: '2px solid #DDE0EE', borderTop: '2px solid #06175D', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
+  btnEdit: { padding: '5px 12px', fontSize: '12px', fontWeight: '600', background: '#EEF1FB', color: '#06175D', border: '1px solid #DDE0EE', borderRadius: '6px', cursor: 'pointer' },
   btnDel: { padding: '5px 12px', fontSize: '12px', fontWeight: '600', background: '#fff', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '6px', cursor: 'pointer' },
   btnDanger: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  btnGhost: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' },
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modal: { background: '#fff', borderRadius: '12px', padding: '1.5rem', width: '540px', maxWidth: '95vw', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' },
+  btnGhost: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#F0F2FA', color: '#9599AE', border: '1px solid #DDE0EE', borderRadius: '6px', cursor: 'pointer' },
+  overlay: { position: 'fixed', inset: 0, background: 'rgba(6,23,93,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modal: { background: '#fff', borderRadius: '12px', padding: '1.5rem', width: '540px', maxWidth: '95vw', boxShadow: '0 20px 60px rgba(6,23,93,0.2)' },
 }

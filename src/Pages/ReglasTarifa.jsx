@@ -114,7 +114,13 @@ export default function ReglasTarifa() {
 
       {msg && <div style={styles.msg}>{msg}</div>}
 
-      <div style={styles.card}>
+      {session?.rol !== 'proveedor' && (
+        <div style={{ ...styles.msg, background: '#EEF1FB', borderColor: '#DDE0EE', color: '#06175D' }}>
+          Solo los proveedores pueden crear reglas de tarifa.
+        </div>
+      )}
+
+      {session?.rol === 'proveedor' && <div style={styles.card}>
         <h3 style={styles.cardTitle}>Nueva regla de tarifa</h3>
 
         <div style={styles.grid}>
@@ -163,7 +169,7 @@ export default function ReglasTarifa() {
             {saving ? 'Creando...' : 'Crear regla'}
           </button>
         </div>
-      </div>
+      </div>}
 
       <DataTable data={reglas} loading={loading} emptyMsg="No hay reglas de tarifa para este proveedor." />
     </div>
@@ -171,18 +177,18 @@ export default function ReglasTarifa() {
 }
 
 const styles = {
-  refreshBtn: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#475569' },
-  msg: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', color: '#334155', fontSize: '13px' },
-  card: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' },
-  cardTitle: { margin: '0 0 1rem', fontSize: '16px', color: '#0f172a' },
+  refreshBtn: { background: '#fff', border: '1px solid #DDE0EE', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#9599AE' },
+  msg: { background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', color: '#1A1D3B', fontSize: '13px' },
+  card: { background: '#fff', border: '1px solid #DDE0EE', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' },
+  cardTitle: { margin: '0 0 1rem', fontSize: '16px', color: '#1A1D3B' },
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' },
-  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' },
-  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', background: '#fff', color: '#0f172a', outline: 'none' },
+  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#9599AE', marginBottom: '6px' },
+  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', background: '#fff', color: '#1A1D3B', outline: 'none' },
   tramosHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' },
-  sectionTitle: { margin: 0, fontSize: '15px', color: '#0f172a' },
-  addBtn: { background: '#fff', color: '#1e293b', border: '1.5px solid #1e293b', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
-  tramoBox: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '8px', alignItems: 'end', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '10px', marginBottom: '8px' },
+  sectionTitle: { margin: 0, fontSize: '15px', color: '#1A1D3B' },
+  addBtn: { background: '#fff', color: '#06175D', border: '1.5px solid #06175D', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  tramoBox: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '8px', alignItems: 'end', background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '10px', padding: '10px', marginBottom: '8px' },
   removeBtn: { background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '8px', padding: '10px 12px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
   actions: { marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' },
-  saveBtn: { padding: '10px 16px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  saveBtn: { padding: '10px 16px', background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
 }

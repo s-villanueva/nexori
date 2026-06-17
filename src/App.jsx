@@ -16,6 +16,14 @@ import ReglasTarifa from './Pages/ReglasTarifa'
 import Productos from './Pages/Productos'
 import Stock from './Pages/Stock'
 import PreciosBase from './Pages/PreciosBase'
+import Proveedores from './Pages/Proveedores'
+import MiCuenta from './Pages/MiCuenta'
+import Admin from './Pages/Admin'
+import AdminProductos from './Pages/admin/AdminProductos'
+import AdminUsuarios from './Pages/admin/AdminUsuarios'
+import AdminLogs from './Pages/admin/AdminLogs'
+import AdminEmpresas from './Pages/admin/AdminEmpresas'
+import AdminProveedores from './Pages/admin/AdminProveedores'
 
 function ProtectedRoutes() {
   const { session } = useAuth()
@@ -41,7 +49,14 @@ function ProtectedRoutes() {
         <Route path="/precios" element={<PreciosBase />} />
         <Route path="/comisiones" element={<VistaPage tipo="comisiones" />} />
         <Route path="/resumen" element={<VistaPage tipo="resumen" />} />
-        <Route path="/proveedores" element={<VistaPage tipo="proveedores" />} />
+        <Route path="/proveedores" element={<Proveedores />} />
+        <Route path="/mi-cuenta"   element={<MiCuenta />} />
+
+        <Route path="/admin/empresas"    element={<AdminEmpresas />} />
+        <Route path="/admin/proveedores" element={<AdminProveedores />} />
+        <Route path="/admin/productos"   element={<AdminProductos />} />
+        <Route path="/admin/usuarios"    element={<AdminUsuarios />} />
+        <Route path="/admin/logs"        element={<AdminLogs />} />
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
@@ -62,6 +77,11 @@ function AppRoutes() {
       <Route
         path="/registro"
         element={session ? <Navigate to="/dashboard" replace /> : <Registro />}
+      />
+
+      <Route
+        path="/admin"
+        element={session?.rol === 'admin' ? <Admin /> : <Navigate to="/login" replace />}
       />
 
       <Route path="/tarifas-producto" element={<TarifasProducto />} />

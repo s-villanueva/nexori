@@ -49,22 +49,24 @@ export async function buildSession(token) {
   const payload = decodeJwt(token)
   const userId = payload?.id
 
-  const [usuarios, proveedores] = await Promise.all([
-    api.get('/api/v1/usuarios'),
+  const [usuariosPage, proveedores] = await Promise.all([
+    api.get('/api/v1/usuarios?size=1000'),
     api.get('/api/v1/proveedores'),
   ])
 
+  const usuarios = usuariosPage.content ?? []
   const usuario = usuarios.find(u => u.id === userId || u.email === payload?.sub)
   if (!usuario) throw new Error('Usuario no encontrado en el sistema.')
 
-  const esProveedor = proveedores.find(p => p.idEmpresa?.id === usuario.idEmpresa?.id && p.activo)
+  const esAdmin = usuario.nombreRol?.toLowerCase() === 'admin'
+  const esProveedor = !esAdmin && proveedores.find(p => p.idEmpresa?.id === usuario.idEmpresa?.id && p.activo)
 
   return {
     id: usuario.id,
     nombre: usuario.nombre,
     email: usuario.email,
     activo: usuario.activo,
-    rol: esProveedor ? 'proveedor' : 'empresa',
+    rol: esAdmin ? 'admin' : esProveedor ? 'proveedor' : 'empresa',
     id_empresa: usuario.idEmpresa?.id,
     id_sucursal: usuario.idSucursal?.id,
     idEmpresa: usuario.idEmpresa,

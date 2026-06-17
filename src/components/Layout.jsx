@@ -1,100 +1,189 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
 
+const C = {
+  primary:  '#06175D',
+  dk:       '#000053',
+  muted:    '#9599AE',
+  white:    '#FFFFFF',
+  bg:       '#F0F2FA',
+  border:   '#DDE0EE',
+  text:     '#1A1D3B',
+}
+
 const proveedorLinks = [
-  { to: '/dashboard',  icon: '▦',  label: 'Dashboard'        },
-  { to: '/mis-ordenes',icon: '📦', label: 'Mis órdenes'      },
-  { to: '/stock',      icon: '🏪', label: 'Stock almacenes'  },
-  { to: '/comisiones', icon: '💰', label: 'Comisiones'       },
-  { to: '/contratos',  icon: '📄', label: 'Contratos'        },
-  { to: '/procedures', icon: '⚙️', label: 'Procedures'       },
-   { to: '/reglas-tarifa', icon: '⚖️', label: 'Reglas de tarifa' },
-   { to: '/productos', icon: '🛍️', label: 'Productos'        },
-   { to: '/precios',   icon: '💲', label: 'Precios base'     },
+  { to: '/dashboard',      icon: 'dashboard',  label: 'Dashboard'        },
+  { to: '/mis-ordenes',    icon: 'orders',     label: 'Mis órdenes'      },
+  { to: '/stock',          icon: 'stock',      label: 'Stock almacenes'  },
+  { to: '/contratos',      icon: 'contratos',  label: 'Contratos'        },
+  { to: '/reglas-tarifa',  icon: 'reglas',     label: 'Reglas de tarifa' },
+  { to: '/productos',      icon: 'productos',  label: 'Productos'        },
+  { to: '/precios',        icon: 'precios',    label: 'Precios base'     },
+  { to: '/mi-cuenta',      icon: 'cuenta',     label: 'Mi cuenta'        },
 ]
 
 const empresaLinks = [
-  { to: '/dashboard',           icon: '▦',  label: 'Dashboard'           },
-  { to: '/mis-ordenes',         icon: '📦', label: 'Mis órdenes'         },
-  { to: '/facturas',            icon: '🧾', label: 'Facturas pendientes' },
-  { to: '/contratos',           icon: '📄', label: 'Contratos'           },
-  { to: '/resumen',             icon: '📊', label: 'Resumen de compras'  },
-  { to: '/proveedores',         icon: '🏭', label: 'Proveedores'         },
-  { to: '/procedures',          icon: '⚙️', label: 'Procedures'          },
+  { to: '/dashboard',   icon: 'dashboard',  label: 'Dashboard'          },
+  { to: '/mis-ordenes', icon: 'orders',     label: 'Mis órdenes'        },
+  { to: '/facturas',    icon: 'facturas',   label: 'Facturas'           },
+  { to: '/contratos',   icon: 'contratos',  label: 'Contratos'          },
+  { to: '/resumen',     icon: 'resumen',    label: 'Resumen de compras' },
+  { to: '/proveedores', icon: 'truck',      label: 'Proveedores'        },
+  { to: '/mi-cuenta',   icon: 'cuenta',     label: 'Mi cuenta'          },
 ]
+
+const adminLinks = [
+  { to: '/dashboard',          icon: 'dashboard',  label: 'Dashboard'   },
+  { to: '/admin/empresas',     icon: 'empresas',   label: 'Empresas'    },
+  { to: '/admin/proveedores',  icon: 'truck',      label: 'Proveedores' },
+  { to: '/admin/productos',    icon: 'productos',  label: 'Productos'   },
+  { to: '/admin/usuarios',     icon: 'usuarios',   label: 'Usuarios'    },
+  { to: '/admin/logs',         icon: 'logs',       label: 'Logs'        },
+]
+
+const rolLabel = { admin: 'Administrador', proveedor: 'Proveedor', empresa: 'Empresa compradora' }
 
 export default function Layout({ children }) {
   const { session, logout } = useAuth()
-  const links = session?.rol === 'proveedor' ? proveedorLinks : empresaLinks
+  const links = session?.rol === 'admin' ? adminLinks
+    : session?.rol === 'proveedor' ? proveedorLinks
+    : empresaLinks
 
   return (
-    <div style={styles.shell}>
-      <aside style={styles.sidebar}>
-        <div style={styles.brand}>
-          <div style={styles.brandIcon}>
-            <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
-              <rect width="28" height="28" rx="8" fill="white"/>
-              <path d="M7 20L14 8L21 20H7Z" fill="#1e293b"/>
+    <div style={s.shell}>
+      {/* ── Sidebar ── */}
+      <aside style={s.sidebar}>
+        {/* Brand */}
+        <div style={s.brand}>
+          <div style={s.brandLogo}>
+            <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="7" fill="white" fillOpacity=".15"/>
+              <path d="M7 21L14 7L21 21H7Z" fill="white"/>
             </svg>
           </div>
           <div>
-            <p style={styles.brandName}>Marketplace B2B</p>
-            <p style={styles.brandRole}>{session?.rol === 'proveedor' ? 'Proveedor' : 'Empresa compradora'}</p>
+            <p style={s.brandName}>Marketplace B2B</p>
+            <p style={s.brandSub}>{rolLabel[session?.rol] ?? 'Panel'}</p>
           </div>
         </div>
 
-        <div style={styles.userCard}>
-          <div style={styles.avatar}>
-            {session?.nombre?.charAt(0).toUpperCase() ?? 'U'}
-          </div>
+        {/* User pill */}
+        <div style={s.userPill}>
+          <div style={s.avatar}>{session?.nombre?.charAt(0).toUpperCase() ?? 'U'}</div>
           <div style={{ minWidth: 0 }}>
-            <p style={styles.userName}>{session?.nombre ?? 'Usuario'}</p>
-            <p style={styles.userEmail}>{session?.email ?? ''}</p>
+            <p style={s.userName}>{session?.nombre ?? 'Usuario'}</p>
+            <p style={s.userEmail}>{session?.email ?? ''}</p>
           </div>
         </div>
 
-        <nav style={styles.nav}>
+        <div style={s.divider} />
+
+        {/* Nav */}
+        <nav style={s.nav}>
           {links.map(l => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              style={({ isActive }) => ({
-                ...styles.navLink,
-                ...(isActive ? styles.navLinkActive : {}),
-              })}
-            >
-              <span style={{ fontSize: '16px' }}>{l.icon}</span>
-              {l.label}
+            <NavLink key={l.to} to={l.to} style={({ isActive }) => ({ ...s.link, ...(isActive ? s.linkActive : {}) })}>
+              <span style={s.linkIcon}><NavIcon type={l.icon} /></span>
+              <span>{l.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        <button onClick={logout} style={styles.logout}>
-          ← Cerrar sesión
+        <div style={{ flex: 1 }} />
+
+        <button onClick={logout} style={s.logout}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
         </button>
       </aside>
 
-      <main style={styles.main}>
-        {children}
-      </main>
+      {/* ── Main ── */}
+      <div style={s.main}>
+        {/* Top bar */}
+        <header style={s.topbar}>
+          <div style={s.topbarInner}>
+            <p style={s.topbarTitle}>{session?.nombreEmpresa ?? 'Mi empresa'}</p>
+            <div style={s.topbarBadge}>{rolLabel[session?.rol]}</div>
+          </div>
+        </header>
+
+        <div style={s.content} className="animate-in">
+          {children}
+        </div>
+      </div>
     </div>
   )
 }
 
-const styles = {
-  shell: { display: 'flex', minHeight: '100vh', background: '#f1f5f9' },
-  sidebar: { width: '240px', flexShrink: 0, background: '#1e293b', display: 'flex', flexDirection: 'column', padding: '1.25rem' },
-  brand: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' },
-  brandIcon: { width: '36px', height: '36px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  brandName: { margin: 0, fontSize: '13px', fontWeight: '700', color: '#f8fafc', lineHeight: 1.2 },
-  brandRole: { margin: 0, fontSize: '11px', color: '#94a3b8' },
-  userCard: { display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px', marginBottom: '1.5rem', overflow: 'hidden' },
-  avatar: { width: '34px', height: '34px', borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '14px', flexShrink: 0 },
-  userName:  { margin: 0, fontSize: '13px', fontWeight: '600', color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  userEmail: { margin: 0, fontSize: '11px', color: '#64748b',  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  nav: { display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 },
-  navLink: { display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', fontSize: '13.5px', fontWeight: '500', color: '#94a3b8', textDecoration: 'none', transition: 'all 0.15s' },
-  navLinkActive: { background: 'rgba(255,255,255,0.1)', color: '#f8fafc' },
-  logout: { marginTop: '1rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#64748b', borderRadius: '8px', padding: '8px', fontSize: '12px', cursor: 'pointer', textAlign: 'left' },
-  main: { flex: 1, padding: '2rem', overflowY: 'auto' },
+function NavIcon({ type }) {
+  const p = {
+    dashboard:  <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
+    orders:     <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+    stock:      <><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
+    contratos:  <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></>,
+    reglas:     <><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></>,
+    productos:  <><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></>,
+    precios:    <><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>,
+    facturas:   <><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></>,
+    resumen:    <><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></>,
+    truck:      <><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></>,
+    perfil:     <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
+    empresas:   <><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="9" y1="12" x2="15" y2="12"/></>,
+    logs:       <><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>,
+    usuarios:   <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+    cuenta:     <><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></>,
+  }
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+      {p[type] ?? null}
+    </svg>
+  )
+}
+
+const s = {
+  shell:      { display: 'flex', minHeight: '100vh', background: '#F0F2FA' },
+
+  sidebar:    { width: '248px', flexShrink: 0, background: C.primary, display: 'flex',
+                flexDirection: 'column', padding: '1.25rem 1rem', gap: '0' },
+
+  brand:      { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' },
+  brandLogo:  { width: '38px', height: '38px', borderRadius: '9px', background: 'rgba(255,255,255,0.1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  brandName:  { fontSize: '13px', fontWeight: '800', color: C.white, letterSpacing: '.3px' },
+  brandSub:   { fontSize: '10px', color: 'rgba(255,255,255,0.45)', marginTop: '1px' },
+
+  userPill:   { display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.08)',
+                borderRadius: '10px', padding: '10px 12px', marginBottom: '1rem', overflow: 'hidden' },
+  avatar:     { width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)',
+                color: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: '700', fontSize: '14px', flexShrink: 0 },
+  userName:   { fontSize: '13px', fontWeight: '600', color: C.white,
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  userEmail:  { fontSize: '11px', color: 'rgba(255,255,255,0.4)',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '1px' },
+
+  divider:    { height: '1px', background: 'rgba(255,255,255,0.08)', margin: '0 0 0.75rem' },
+
+  nav:        { display: 'flex', flexDirection: 'column', gap: '2px' },
+  link:       { display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px',
+                borderRadius: '8px', fontSize: '13px', fontWeight: '500',
+                color: 'rgba(255,255,255,0.55)', textDecoration: 'none', transition: 'all .15s' },
+  linkActive: { background: 'rgba(255,255,255,0.12)', color: C.white },
+  linkIcon:   { fontSize: '15px', width: '20px', textAlign: 'center', flexShrink: 0 },
+
+  logout:     { display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.4)',
+                borderRadius: '8px', padding: '8px 12px', fontSize: '12px', marginTop: '1rem',
+                cursor: 'pointer', transition: 'all .15s' },
+
+  main:       { flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 },
+
+  topbar:     { background: C.white, borderBottom: '1px solid #DDE0EE',
+                padding: '0 2rem', height: '52px', display: 'flex', alignItems: 'center',
+                boxShadow: '0 1px 3px rgba(6,23,93,0.06)' },
+  topbarInner:{ display: 'flex', alignItems: 'center', gap: '12px' },
+  topbarTitle:{ fontSize: '14px', fontWeight: '600', color: C.text },
+  topbarBadge:{ fontSize: '11px', fontWeight: '600', padding: '3px 10px',
+                background: '#EEF1FB', color: C.primary, borderRadius: '20px' },
+
+  content:    { padding: '1.75rem 2rem', flex: 1 },
 }

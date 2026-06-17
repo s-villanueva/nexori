@@ -430,7 +430,7 @@ export default function MisOrdenes() {
                     const sel = opcionElegida?.idAlmacen === opcion.idAlmacen
                     return (
                       <button key={opcion.idAlmacen}
-                        style={{ ...styles.optionCard, borderColor: sel ? '#1e293b' : '#e2e8f0', background: sel ? '#f8fafc' : '#fff' }}
+                        style={{ ...styles.optionCard, borderColor: sel ? '#06175D' : '#DDE0EE', background: sel ? '#EEF1FB' : '#fff' }}
                         onClick={() => setOpcionElegida(opcion)}>
                         <span style={styles.optionProvider}>{opcion.nombreProveedor}</span>
                         <span style={styles.optionWarehouse}>Almacén: {opcion.nombreAlmacen}</span>
@@ -473,7 +473,7 @@ export default function MisOrdenes() {
                           <span style={styles.precioLabel}>
                             Descuento tarifa
                             {precioInfo.tipoTramo && <span style={styles.tramoBadge}>{precioInfo.tipoTramo}</span>}
-                            {precioInfo.nombreRegla && <span style={{ color: '#64748b', fontSize: '11px' }}> · {precioInfo.nombreRegla}</span>}
+                            {precioInfo.nombreRegla && <span style={{ color: '#9599AE', fontSize: '11px' }}> · {precioInfo.nombreRegla}</span>}
                           </span>
                           <span style={{ ...styles.precioValor, color: '#16a34a', fontWeight: '700' }}>−{precioInfo.descuentoTarifa}%</span>
                         </div>
@@ -482,7 +482,7 @@ export default function MisOrdenes() {
                         <div style={{ ...styles.precioFila, ...styles.precioDescuento }}>
                           <span style={styles.precioLabel}>
                             Descuento contrato
-                            {precioInfo.origenContrato && <span style={{ color: '#64748b', fontSize: '11px' }}> · {precioInfo.origenContrato}</span>}
+                            {precioInfo.origenContrato && <span style={{ color: '#9599AE', fontSize: '11px' }}> · {precioInfo.origenContrato}</span>}
                           </span>
                           <span style={{ ...styles.precioValor, color: '#16a34a', fontWeight: '700' }}>−{precioInfo.descuentoContrato}%</span>
                         </div>
@@ -518,14 +518,14 @@ export default function MisOrdenes() {
                       <div>
                         <strong>{p.sku}</strong> — {p.nombre}
                         <br />
-                        <span style={{ fontSize: '12px', color: '#64748b' }}>
+                        <span style={{ fontSize: '12px', color: '#9599AE' }}>
                           Cant: {p.cantidad} · {p.nombreProveedor} · {p.nombreAlmacen}
                         </span>
                         {precioUnit != null && (
                           <span style={{ display: 'block', fontSize: '12px', color: '#166534', fontWeight: '600', marginTop: '2px' }}>
                             {formatBOB(precioUnit)}/u
                             {p.descuentoTotal > 0 && <span style={{ color: '#16a34a' }}> (−{p.descuentoTotal}%)</span>}
-                            {subtotal != null && <span style={{ color: '#0f172a', marginLeft: '8px' }}>= {formatBOB(subtotal)}</span>}
+                            {subtotal != null && <span style={{ color: '#1A1D3B', marginLeft: '8px' }}>= {formatBOB(subtotal)}</span>}
                           </span>
                         )}
                         {precioUnit == null && (
@@ -569,9 +569,9 @@ export default function MisOrdenes() {
       {qrModal.open && (
         <div style={styles.modalOverlay}>
           <div style={{ ...styles.modal, maxWidth: '380px', textAlign: 'center' }}>
-            <p style={{ margin: '0 0 1.25rem', fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>Pago con QR</p>
+            <p style={{ margin: '0 0 1.25rem', fontSize: '18px', fontWeight: '700', color: '#1A1D3B' }}>Pago con QR</p>
             {qrModal.loading ? (
-              <p style={{ color: '#64748b', margin: '2rem 0' }}>Generando QR...</p>
+              <p style={{ color: '#9599AE', margin: '2rem 0' }}>Generando QR...</p>
             ) : qrModal.qrBase64 ? (
               <>
                 <img
@@ -581,21 +581,21 @@ export default function MisOrdenes() {
                 />
                 {qrModal.amount != null && (
                   <div style={{ margin: '0 auto 1rem', textAlign: 'center' }}>
-                    <span style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '2px' }}>Monto a pagar</span>
-                    <span style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a' }}>{formatBOB(qrModal.amount)}</span>
+                    <span style={{ fontSize: '12px', color: '#9599AE', display: 'block', marginBottom: '2px' }}>Monto a pagar</span>
+                    <span style={{ fontSize: '22px', fontWeight: '800', color: '#1A1D3B' }}>{formatBOB(qrModal.amount)}</span>
                   </div>
                 )}
                 {esperandoWebhook ? (
                   <div style={{ marginBottom: '1.5rem' }}>
                     <p style={{ fontSize: '13px', color: '#1e40af', fontWeight: '600', margin: '0 0 4px' }}>Escaneá el QR con tu billetera</p>
-                    <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>El pago se confirmará automáticamente</p>
+                    <p style={{ fontSize: '12px', color: '#9599AE', margin: 0 }}>El pago se confirmará automáticamente</p>
                     <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
                       <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: '600' }}>Escuchando confirmación...</span>
                     </div>
                   </div>
                 ) : (
-                  <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '1.5rem' }}>Escaneá el QR y luego confirmá el pago</p>
+                  <p style={{ fontSize: '13px', color: '#9599AE', marginBottom: '1.5rem' }}>Escaneá el QR y luego confirmá el pago</p>
                 )}
                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <button style={styles.cancelBtn} onClick={cerrarQr}>Cancelar</button>
@@ -684,65 +684,65 @@ export default function MisOrdenes() {
 
 const styles = {
   headerActions: { display: 'flex', gap: '8px' },
-  newBtn: { background: '#1e293b', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#fff', fontWeight: '600' },
-  refreshBtn: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#475569' },
+  newBtn: { background: '#06175D', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#fff', fontWeight: '600' },
+  refreshBtn: { background: '#fff', border: '1px solid #DDE0EE', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#9599AE' },
   toast: { border: '1px solid', borderRadius: '8px', padding: '12px 16px', marginBottom: '1rem', fontSize: '14px' },
-  triggerInfo: { background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem' },
-  triggerTitle: { margin: '0 0 8px', fontWeight: '600', fontSize: '13px', color: '#1e40af' },
+  triggerInfo: { background: '#EEF1FB', border: '1px solid #DDE0EE', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem' },
+  triggerTitle: { margin: '0 0 8px', fontWeight: '600', fontSize: '13px', color: '#06175D' },
   triggerGrid: { display: 'flex', flexDirection: 'column', gap: '4px' },
-  triggerItem: { display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#1e3a8a' },
-  triggerBadge: { background: '#1e40af', color: '#fff', borderRadius: '4px', padding: '1px 7px', fontSize: '11px', fontWeight: '700', flexShrink: 0 },
-  tableWrap: { overflowX: 'auto', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' },
+  triggerItem: { display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#1A1D3B' },
+  triggerBadge: { background: '#06175D', color: '#fff', borderRadius: '4px', padding: '1px 7px', fontSize: '11px', fontWeight: '700', flexShrink: 0 },
+  tableWrap: { overflowX: 'auto', background: '#fff', borderRadius: '12px', border: '1px solid #DDE0EE' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
-  thead: { background: '#f8fafc' },
-  th: { padding: '11px 14px', textAlign: 'left', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', whiteSpace: 'nowrap' },
-  td: { padding: '10px 14px', color: '#334155', borderBottom: '1px solid #f1f5f9', whiteSpace: 'nowrap' },
+  thead: { background: '#EEF1FB' },
+  th: { padding: '11px 14px', textAlign: 'left', fontWeight: '700', color: '#06175D', borderBottom: '1px solid #DDE0EE', whiteSpace: 'nowrap' },
+  td: { padding: '10px 14px', color: '#1A1D3B', borderBottom: '1px solid #F0F2FA', whiteSpace: 'nowrap' },
   badge: { padding: '3px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: '600' },
   actions: { display: 'flex', gap: '6px' },
   actionBtn: { border: 'none', borderRadius: '6px', padding: '5px 10px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
-  noActions: { color: '#94a3b8', fontSize: '12px', fontWeight: '600' },
-  modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' },
-  modal: { background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '800px', padding: '1.5rem', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', maxHeight: '90vh', overflowY: 'auto' },
+  noActions: { color: '#9599AE', fontSize: '12px', fontWeight: '600' },
+  modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(6,23,93,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' },
+  modal: { background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '800px', padding: '1.5rem', boxShadow: '0 20px 60px rgba(6,23,93,0.2)', maxHeight: '90vh', overflowY: 'auto' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' },
-  modalTitle: { margin: 0, fontSize: '20px', fontWeight: '700', color: '#0f172a' },
-  modalSub: { margin: '4px 0 0', fontSize: '13px', color: '#64748b' },
-  closeBtn: { border: 'none', background: '#f1f5f9', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '20px', color: '#475569' },
-  autoInfo: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '12px', marginBottom: '1rem', fontSize: '13px' },
-  autoLabel: { display: 'block', color: '#64748b', fontSize: '11px', marginBottom: '3px' },
+  modalTitle: { margin: 0, fontSize: '20px', fontWeight: '700', color: '#1A1D3B' },
+  modalSub: { margin: '4px 0 0', fontSize: '13px', color: '#9599AE' },
+  closeBtn: { border: 'none', background: '#EEF1FB', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '20px', color: '#9599AE' },
+  autoInfo: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '10px', padding: '12px', marginBottom: '1rem', fontSize: '13px' },
+  autoLabel: { display: 'block', color: '#9599AE', fontSize: '11px', marginBottom: '3px' },
   searchBox: { marginBottom: '1rem' },
   searchRow: { display: 'grid', gridTemplateColumns: '1fr 110px', gap: '8px' },
-  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' },
-  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box', background: '#fff' },
-  searchBtn: { background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
-  productCard: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '12px', marginBottom: '1rem' },
-  productTitle: { margin: '0 0 4px', fontWeight: '700', color: '#0f172a' },
-  productDesc: { margin: '0 0 4px', fontSize: '13px', color: '#64748b' },
-  productUnit: { margin: 0, fontSize: '12px', color: '#94a3b8' },
+  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#9599AE', marginBottom: '6px' },
+  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', color: '#1A1D3B', outline: 'none', boxSizing: 'border-box', background: '#fff' },
+  searchBtn: { background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  productCard: { background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '10px', padding: '12px', marginBottom: '1rem' },
+  productTitle: { margin: '0 0 4px', fontWeight: '700', color: '#1A1D3B' },
+  productDesc: { margin: '0 0 4px', fontSize: '13px', color: '#9599AE' },
+  productUnit: { margin: 0, fontSize: '12px', color: '#9599AE' },
   stockBox: { marginTop: '1rem' },
-  sectionTitle: { margin: '0 0 0.75rem', fontWeight: '700', fontSize: '14px', color: '#0f172a' },
+  sectionTitle: { margin: '0 0 0.75rem', fontWeight: '700', fontSize: '14px', color: '#1A1D3B' },
   optionsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' },
   optionCard: { textAlign: 'left', border: '1.5px solid', borderRadius: '10px', padding: '10px', cursor: 'pointer', background: '#fff' },
-  optionProvider: { display: 'block', fontWeight: '700', color: '#0f172a', marginBottom: '4px' },
-  optionWarehouse: { display: 'block', fontSize: '13px', color: '#475569', marginBottom: '3px' },
+  optionProvider: { display: 'block', fontWeight: '700', color: '#1A1D3B', marginBottom: '4px' },
+  optionWarehouse: { display: 'block', fontSize: '13px', color: '#9599AE', marginBottom: '3px' },
   optionStock: { display: 'block', fontSize: '12px', color: '#166534', fontWeight: '600' },
-  quantityBox: { marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' },
+  quantityBox: { marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #DDE0EE' },
   addRow: { display: 'flex', gap: '8px', alignItems: 'center' },
-  qtyInput: { width: '130px', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' },
-  addBtn: { padding: '10px 14px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
-  quantityHint: { margin: '6px 0 0', color: '#64748b', fontSize: '12px' },
-  precioBox: { marginTop: '1rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px 16px' },
-  precioLoading: { margin: 0, fontSize: '13px', color: '#64748b' },
-  precioTitulo: { margin: '0 0 10px', fontWeight: '700', fontSize: '13px', color: '#0f172a' },
+  qtyInput: { width: '130px', padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' },
+  addBtn: { padding: '10px 14px', background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  quantityHint: { margin: '6px 0 0', color: '#9599AE', fontSize: '12px' },
+  precioBox: { marginTop: '1rem', background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '12px', padding: '14px 16px' },
+  precioLoading: { margin: 0, fontSize: '13px', color: '#9599AE' },
+  precioTitulo: { margin: '0 0 10px', fontWeight: '700', fontSize: '13px', color: '#1A1D3B' },
   precioGrid: { display: 'flex', flexDirection: 'column', gap: '6px' },
   precioFila: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', fontSize: '13px' },
   precioDescuento: { background: '#f0fdf4', borderRadius: '6px', padding: '4px 8px' },
-  precioLabel: { color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' },
-  precioValor: { fontWeight: '600', color: '#0f172a', whiteSpace: 'nowrap' },
-  tramoBadge: { background: '#1e40af', color: '#fff', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: '700' },
-  orderList: { marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' },
-  orderItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', marginBottom: '8px', fontSize: '13px', color: '#334155' },
+  precioLabel: { color: '#9599AE', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' },
+  precioValor: { fontWeight: '600', color: '#1A1D3B', whiteSpace: 'nowrap' },
+  tramoBadge: { background: '#06175D', color: '#fff', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: '700' },
+  orderList: { marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #DDE0EE' },
+  orderItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '8px', padding: '10px', marginBottom: '8px', fontSize: '13px', color: '#1A1D3B' },
   removeBtn: { border: 'none', background: '#fee2e2', color: '#991b1b', borderRadius: '6px', padding: '6px 10px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
   modalActions: { marginTop: '1.25rem', display: 'flex', justifyContent: 'flex-end', gap: '8px' },
-  cancelBtn: { padding: '10px 16px', background: '#fff', border: '1.5px solid #e2e8f0', color: '#475569', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
-  saveBtn: { padding: '10px 16px', background: '#1e293b', border: 'none', color: '#fff', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  cancelBtn: { padding: '10px 16px', background: '#fff', border: '1.5px solid #DDE0EE', color: '#9599AE', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  saveBtn: { padding: '10px 16px', background: '#06175D', border: 'none', color: '#fff', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
 }

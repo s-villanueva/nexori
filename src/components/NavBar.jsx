@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
 
 const links = [
-  { to: '/',           label: '🏠 Dashboard' },
-  { to: '/vistas',     label: '📊 Vistas' },
-  { to: '/ordenes',    label: '📦 Órdenes (Triggers T2/T3)' },
-  { to: '/facturas',   label: '🧾 Facturas (Triggers T4/T5)' },
-  { to: '/procedures', label: '⚙️ Procedures' },
-  
+  { to: '/',           label: 'Dashboard' },
+  { to: '/vistas',     label: 'Vistas' },
+  { to: '/ordenes',    label: 'Órdenes (Triggers T2/T3)' },
+  { to: '/facturas',   label: 'Facturas (Triggers T4/T5)' },
+  { to: '/procedures', label: 'Procedures' },
 ]
 
 export default function NavBar() {

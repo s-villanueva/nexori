@@ -7,163 +7,114 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const [email, setEmail] = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const [qrData, setQrData] = useState(null)
-  const [qrLoading, setQrLoading] = useState(false)
-  const [qrError, setQrError] = useState('')
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     try {
       const authRes = await api.post('/api/v1/auth/login', {
         email: email.trim(),
         passwordHash: password,
       })
-
       const token = authRes?.access_token
       if (!token) throw new Error('No se recibió token del servidor.')
-
       setToken(token)
-
       const sesion = await buildSession(token)
       login(sesion)
       navigate('/dashboard')
     } catch (err) {
       setToken(null)
-      setError(err.message || 'Error al iniciar sesión.')
+      setError(err.message || 'Credenciales incorrectas.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCargarQr = async () => {
-    setQrError('')
-    setQrData(null)
-    setQrLoading(true)
-    try {
-      const res = await api.post('/api/pagos/crear-cobro', {
-        country: 'BO',
-        amount: '10',
-        currency: 'USDT',
-        network: 'POLYGON',
-        charge_reason: 'Pago de prueba B2B',
-        reservation_validity_time: '10',
-        customer: {
-          name: 'Test',
-          lastname: 'Usuario',
-          document_number: '00000000',
-        },
-      })
-      setQrData(res)
-    } catch (err) {
-      setQrError(err.message || 'Error al cargar QR desde Stereum.')
-    } finally {
-      setQrLoading(false)
-    }
-  }
-
   return (
-    <div style={styles.bg}>
-      <div style={styles.sidePanel}>
-        <div style={styles.sidePanelInner}>
-          <p style={styles.sidePanelTitle}>Pago de prueba</p>
-          <p style={styles.sidePanelSub}>Genera un QR de pago cripto vía Stereum</p>
-          <button
-            style={{ ...styles.qrBtn, ...(qrLoading ? styles.qrBtnDisabled : {}) }}
-            type="button"
-            onClick={handleCargarQr}
-            disabled={qrLoading}
-          >
-            {qrLoading ? 'Cargando...' : 'Cargar QR de prueba desde Stereum'}
-          </button>
-          {qrError && <p style={styles.qrError}>{qrError}</p>}
-          {qrData && (
-            <div style={styles.qrResult}>
-              {qrData.qr_base64 && (
-                <img
-                  src={`data:image/png;base64,${qrData.qr_base64}`}
-                  alt="QR de pago"
-                  style={styles.qrImage}
-                />
-              )}
-              <div style={styles.qrMeta}>
-                <p style={styles.qrMetaRow}><span style={styles.qrMetaLabel}>Monto:</span> {qrData.amount} {qrData.currency}</p>
-                <p style={styles.qrMetaRow}><span style={styles.qrMetaLabel}>Red:</span> {qrData.network}</p>
-                <p style={styles.qrMetaRow}><span style={styles.qrMetaLabel}>Estado:</span> {qrData.transaction_status}</p>
-                {qrData.payment_link && (
-                  <a href={qrData.payment_link} target="_blank" rel="noopener noreferrer" style={styles.qrLink}>
-                    Abrir enlace de pago →
-                  </a>
-                )}
-              </div>
+    <div style={s.page}>
+      {/* Left panel */}
+      <div style={s.left}>
+        <div style={s.leftInner}>
+          <div style={s.logoRow}>
+            <div style={s.logoBox}>
+              <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                <rect width="28" height="28" rx="7" fill="white" fillOpacity=".15"/>
+                <path d="M7 21L14 7L21 21H7Z" fill="white"/>
+              </svg>
             </div>
-          )}
+            <span style={s.logoText}>Marketplace B2B</span>
+          </div>
+
+          <h2 style={s.heroTitle}>La plataforma para tu negocio</h2>
+          <p style={s.heroSub}>Conecta con proveedores, gestiona órdenes y controla tu cadena de suministro desde un solo lugar.</p>
+
+          <div style={s.featureList}>
+            {['Gestión de órdenes en tiempo real', 'Panel de proveedores y contratos', 'Reportes y auditoría de actividad'].map(f => (
+              <div key={f} style={s.feature}>
+                <div style={s.featureDot} />
+                <span style={s.featureText}>{f}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div style={styles.card}>
-        <div style={styles.logoRow}>
-          <div style={styles.logoCircle}>
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <rect width="28" height="28" rx="8" fill="#1e293b" />
-              <path d="M7 20L14 8L21 20H7Z" fill="white" opacity="0.9" />
-            </svg>
+      {/* Right panel */}
+      <div style={s.right}>
+        <div style={s.card}>
+          <h1 style={s.cardTitle}>Iniciar sesión</h1>
+          <p style={s.cardSub}>Ingresa tus credenciales para acceder al panel</p>
+
+          <form onSubmit={handleLogin} style={s.form}>
+            <div style={s.field}>
+              <label style={s.label}>Correo electrónico</label>
+              <input
+                style={s.input}
+                type="email"
+                placeholder="usuario@empresa.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div style={s.field}>
+              <label style={s.label}>Contraseña</label>
+              <input
+                style={s.input}
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {error && (
+              <div style={s.errorBox}>
+                <span style={s.errorIcon}>!</span>
+                {error}
+              </div>
+            )}
+
+            <button style={s.btn} type="submit" disabled={loading}>
+              {loading ? 'Verificando...' : 'Ingresar →'}
+            </button>
+          </form>
+
+          <div style={s.divider}>
+            <span style={s.dividerLine} />
+            <span style={s.dividerText}>¿No tienes cuenta?</span>
+            <span style={s.dividerLine} />
           </div>
-          <div>
-            <p style={styles.logoTitle}>Marketplace B2B</p>
-            <p style={styles.logoSub}>Panel de gestión</p>
-          </div>
-        </div>
 
-        <p style={styles.heading}>Iniciá sesión</p>
-
-        <form onSubmit={handleLogin}>
-          <div style={styles.field}>
-            <label style={styles.label}>Email</label>
-            <input
-              style={styles.input}
-              type="email"
-              placeholder="usuario@empresa.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Contraseña</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          {error && <p style={styles.error}>{error}</p>}
-
-          <button style={styles.submit} type="submit" disabled={loading}>
-            {loading ? 'Verificando...' : 'Ingresar →'}
-          </button>
-        </form>
-
-        <div style={styles.registerBox}>
-          <p style={styles.registerText}>¿Tu empresa todavía no tiene cuenta?</p>
-          <button
-            style={styles.registerBtn}
-            type="button"
-            onClick={() => navigate('/registro')}
-          >
-            Registrar empresa →
+          <button style={s.btnOutline} onClick={() => navigate('/registro')}>
+            Registrar empresa
           </button>
         </div>
       </div>
@@ -171,33 +122,53 @@ export default function Login() {
   )
 }
 
-const styles = {
-  bg: { minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '2rem', flexWrap: 'wrap' },
-  sidePanel: { background: '#fff', borderRadius: '16px', padding: '2rem', width: '100%', maxWidth: '320px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', alignSelf: 'flex-start' },
-  sidePanelInner: { display: 'flex', flexDirection: 'column', gap: '1rem' },
-  sidePanelTitle: { margin: 0, fontWeight: '700', fontSize: '15px', color: '#0f172a' },
-  sidePanelSub: { margin: 0, fontSize: '13px', color: '#64748b' },
-  qrBtn: { width: '100%', padding: '11px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
-  qrBtnDisabled: { opacity: 0.6, cursor: 'not-allowed' },
-  qrError: { color: '#dc2626', fontSize: '13px', background: '#fef2f2', padding: '8px 12px', borderRadius: '6px', margin: 0 },
-  qrResult: { display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' },
-  qrImage: { width: '100%', maxWidth: '220px', borderRadius: '8px', border: '1px solid #e2e8f0' },
-  qrMeta: { width: '100%', display: 'flex', flexDirection: 'column', gap: '4px' },
-  qrMetaRow: { margin: 0, fontSize: '13px', color: '#334155' },
-  qrMetaLabel: { fontWeight: '600', color: '#0f172a' },
-  qrLink: { fontSize: '13px', color: '#2563eb', textDecoration: 'none', fontWeight: '500' },
-  card: { background: '#fff', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '420px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' },
-  logoRow: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '2rem' },
-  logoCircle: { width: '44px', height: '44px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0 },
-  logoTitle: { margin: 0, fontWeight: '700', fontSize: '15px', color: '#0f172a' },
-  logoSub: { margin: 0, fontSize: '12px', color: '#94a3b8' },
-  heading: { fontSize: '22px', fontWeight: '600', color: '#0f172a', margin: '0 0 1.5rem' },
-  field: { marginBottom: '1rem' },
-  label: { display: 'block', fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '6px' },
-  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box', background: '#fff' },
-  error: { color: '#dc2626', fontSize: '13px', marginBottom: '0.75rem', background: '#fef2f2', padding: '8px 12px', borderRadius: '6px' },
-  submit: { width: '100%', padding: '11px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '600', cursor: 'pointer', marginTop: '0.5rem' },
-  registerBox: { marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', textAlign: 'center' },
-  registerText: { margin: '0 0 0.75rem', fontSize: '13px', color: '#64748b' },
-  registerBtn: { width: '100%', padding: '10px', background: '#fff', color: '#1e293b', border: '1.5px solid #1e293b', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+const s = {
+  page:        { display: 'flex', minHeight: '100vh' },
+
+  left:        { flex: '1', background: '#06175D', display: 'flex', alignItems: 'center',
+                 justifyContent: 'center', padding: '3rem 2.5rem' },
+  leftInner:   { maxWidth: '400px' },
+  logoRow:     { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2.5rem' },
+  logoBox:     { width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.12)',
+                 display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  logoText:    { fontSize: '16px', fontWeight: '800', color: '#fff', letterSpacing: '.3px' },
+  heroTitle:   { fontSize: '32px', fontWeight: '800', color: '#fff', lineHeight: 1.2, marginBottom: '1rem' },
+  heroSub:     { fontSize: '14px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: '2rem' },
+  featureList: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  feature:     { display: 'flex', alignItems: 'center', gap: '12px' },
+  featureDot:  { width: '8px', height: '8px', borderRadius: '50%', background: 'rgba(255,255,255,0.4)', flexShrink: 0 },
+  featureText: { fontSize: '13px', color: 'rgba(255,255,255,0.65)' },
+
+  right:       { width: '440px', flexShrink: 0, background: '#F0F2FA',
+                 display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' },
+  card:        { background: '#fff', borderRadius: '16px', padding: '2.25rem',
+                 width: '100%', boxShadow: '0 4px 24px rgba(6,23,93,0.10)' },
+  cardTitle:   { fontSize: '22px', fontWeight: '800', color: '#06175D', marginBottom: '4px' },
+  cardSub:     { fontSize: '13px', color: '#9599AE', marginBottom: '1.75rem' },
+
+  form:        { display: 'flex', flexDirection: 'column', gap: '1rem' },
+  field:       { display: 'flex', flexDirection: 'column', gap: '5px' },
+  label:       { fontSize: '12px', fontWeight: '700', color: '#1A1D3B', textTransform: 'uppercase', letterSpacing: '.5px' },
+  input:       { padding: '10px 14px', border: '1.5px solid #DDE0EE', borderRadius: '8px',
+                 fontSize: '14px', color: '#1A1D3B', background: '#fff', outline: 'none',
+                 transition: 'border-color .15s' },
+
+  errorBox:    { display: 'flex', alignItems: 'center', gap: '8px', background: '#FEF2F2',
+                 border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 14px',
+                 fontSize: '13px', color: '#B91C1C' },
+  errorIcon:   { width: '18px', height: '18px', borderRadius: '50%', background: '#FEE2E2',
+                 color: '#B91C1C', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                 fontWeight: '700', fontSize: '11px', flexShrink: 0 },
+
+  btn:         { padding: '12px', background: '#06175D', color: '#fff', border: 'none',
+                 borderRadius: '9px', fontSize: '14px', fontWeight: '700',
+                 cursor: 'pointer', marginTop: '0.25rem', letterSpacing: '.3px' },
+
+  divider:     { display: 'flex', alignItems: 'center', gap: '10px', margin: '1.5rem 0 1rem' },
+  dividerLine: { flex: 1, height: '1px', background: '#DDE0EE' },
+  dividerText: { fontSize: '12px', color: '#9599AE', whiteSpace: 'nowrap' },
+
+  btnOutline:  { width: '100%', padding: '11px', background: 'transparent',
+                 color: '#06175D', border: '1.5px solid #06175D',
+                 borderRadius: '9px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' },
 }

@@ -66,7 +66,7 @@ export default function TarifasProducto() {
 
 const styles = {
   searchRow: { display: 'grid', gridTemplateColumns: '1fr 120px', gap: '8px', marginBottom: '1rem' },
-  input: { padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px' },
-  searchBtn: { background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' },
-  msg: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', color: '#334155', fontSize: '13px' },
+  input: { padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', color: '#1A1D3B', outline: 'none' },
+  searchBtn: { background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' },
+  msg: { background: '#F0F2FA', border: '1px solid #DDE0EE', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', color: '#1A1D3B', fontSize: '13px' },
 }
