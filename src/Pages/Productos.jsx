@@ -17,6 +17,8 @@ export default function Productos() {
   const [deletingId, setDeletingId] = useState(null)
   const [createForm, setCreateForm] = useState(emptyForm)
   const [editModal, setEditModal] = useState({ open: false, id: null, form: emptyForm })
+  const [page, setPage] = useState(0)
+  const PAGE_SIZE = 10
 
   const showMsg = (text, ok = true) => setMsg({ text, ok })
 
@@ -35,8 +37,10 @@ export default function Productos() {
       if (resolvedId) {
         const prodData = await api.get(`/api/v1/products/proveedor/${resolvedId}`)
         setProductos(prodData || [])
+        setPage(0)
       } else {
         setProductos([])
+        setPage(0)
       }
     } catch (e) {
       showMsg(`Error cargando datos: ${e.message}`, false)
@@ -194,56 +198,80 @@ export default function Productos() {
           <div style={styles.empty}><div style={styles.spinner} /> Cargando...</div>
         ) : productos.length === 0 ? (
           <p style={styles.emptyText}>No hay productos registrados en tu almacén.</p>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                {['SKU', 'Nombre', 'Descripción', 'Unidad', 'Categoría', 'Estado', 'Acciones'].map(h => (
-                  <th key={h} style={styles.th}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {productos.map((p, i) => (
-                <tr key={p.id} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
-                  <td style={styles.td}>{p.sku || '—'}</td>
-                  <td style={styles.td}>{p.nombre}</td>
-                  <td style={{ ...styles.td, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {p.descripcion || '—'}
-                  </td>
-                  <td style={styles.td}>{p.unidadMedida || '—'}</td>
-                  <td style={styles.td}>{p.idCategoria?.nombre || p.nombreCategoria || '—'}</td>
-                  <td style={styles.td}>
-                    <span style={{ color: p.activo ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
-                      {p.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td style={styles.td}>
-                    {deletingId === p.id ? (
-                      <span style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '12px', color: '#64748b' }}>¿Confirmar?</span>
-                        <button style={styles.btnDanger} onClick={() => eliminar(p.id)}>Sí</button>
-                        <button style={styles.btnGhost} onClick={() => setDeletingId(null)}>No</button>
-                      </span>
-                    ) : (
-                      <span style={{ display: 'flex', gap: '6px' }}>
-                        <button style={styles.btnEdit} onClick={() => abrirEditar(p)}>Editar</button>
-                        <button style={styles.btnDel} onClick={() => setDeletingId(p.id)}>Eliminar</button>
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        ) : (() => {
+          const totalPages = Math.ceil(productos.length / PAGE_SIZE)
+          const paginated = productos.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+          return (
+            <>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    {['SKU', 'Nombre', 'Descripción', 'Unidad', 'Categoría', 'Estado', 'Acciones'].map(h => (
+                      <th key={h} style={styles.th}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((p, i) => (
+                    <tr key={p.id} style={{ background: i % 2 === 0 ? '#fff' : '#F7F8FC' }}>
+                      <td style={styles.td}>{p.sku || '—'}</td>
+                      <td style={styles.td}>{p.nombre}</td>
+                      <td style={{ ...styles.td, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {p.descripcion || '—'}
+                      </td>
+                      <td style={styles.td}>{p.unidadMedida || '—'}</td>
+                      <td style={styles.td}>{p.idCategoria?.nombre || p.nombreCategoria || '—'}</td>
+                      <td style={styles.td}>
+                        <span style={{ color: p.activo ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                          {p.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        {deletingId === p.id ? (
+                          <span style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <span style={{ fontSize: '12px', color: '#9599AE' }}>¿Confirmar?</span>
+                            <button style={styles.btnDanger} onClick={() => eliminar(p.id)}>Sí</button>
+                            <button style={styles.btnGhost} onClick={() => setDeletingId(null)}>No</button>
+                          </span>
+                        ) : (
+                          <span style={{ display: 'flex', gap: '6px' }}>
+                            <button style={styles.btnEdit} onClick={() => abrirEditar(p)}>Editar</button>
+                            <button style={styles.btnDel} onClick={() => setDeletingId(p.id)}>Eliminar</button>
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={styles.pagination}>
+                <span style={styles.pageInfo}>
+                  {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, productos.length)} de {productos.length}
+                </span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button style={styles.pageBtn} onClick={() => setPage(p => p - 1)} disabled={page === 0}>‹</button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      style={{ ...styles.pageBtn, ...(i === page ? styles.pageBtnActive : {}) }}
+                      onClick={() => setPage(i)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button style={styles.pageBtn} onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>›</button>
+                </div>
+              </div>
+            </>
+          )
+        })()}
       </div>
 
       {/* Modal editar */}
       {editModal.open && (
         <div style={styles.overlay} onClick={() => setEditModal({ open: false, id: null, form: emptyForm })}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 1rem', fontSize: '16px', color: '#0f172a' }}>Editar producto</h3>
+            <h3 style={{ margin: '0 0 1rem', fontSize: '16px', color: '#1A1D3B' }}>Editar producto</h3>
             <div style={styles.grid}>
               <div>
                 <label style={styles.label}>SKU</label>
@@ -298,28 +326,32 @@ export default function Productos() {
 }
 
 const styles = {
-  refreshBtn: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#475569' },
+  refreshBtn: { background: '#fff', border: '1.5px solid #DDE0EE', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', color: '#9599AE', fontWeight: '600' },
   msg: { border: '1px solid', borderRadius: '8px', padding: '10px 14px', marginBottom: '1rem', fontSize: '13px' },
-  card: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' },
-  cardTitle: { margin: '0 0 1rem', fontSize: '16px', color: '#0f172a' },
+  card: { background: '#fff', border: '1px solid #DDE0EE', borderRadius: '12px', padding: '1.25rem', marginBottom: '1rem', boxShadow: '0 1px 4px rgba(6,23,93,0.06)' },
+  cardTitle: { margin: '0 0 1rem', fontSize: '14px', fontWeight: '700', color: '#06175D' },
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' },
   full: { gridColumn: '1 / -1' },
-  label: { display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' },
-  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', background: '#fff', color: '#0f172a', outline: 'none' },
+  label: { display: 'block', fontSize: '11px', fontWeight: '700', color: '#1A1D3B', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '.4px' },
+  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', background: '#fff', color: '#1A1D3B', outline: 'none' },
   actions: { marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '8px' },
-  clearBtn: { padding: '10px 16px', background: '#fff', color: '#475569', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
-  saveBtn: { padding: '10px 16px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
-  tableWrapper: { overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '10px', background: '#fff' },
+  clearBtn: { padding: '9px 16px', background: '#fff', color: '#9599AE', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  saveBtn: { padding: '9px 16px', background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' },
+  tableWrapper: { overflowX: 'auto', border: '1px solid #DDE0EE', borderRadius: '12px', background: '#fff', boxShadow: '0 1px 4px rgba(6,23,93,0.06)' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
-  th: { padding: '10px 14px', background: '#f1f5f9', color: '#475569', fontWeight: '600', textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid #e2e8f0' },
-  td: { padding: '9px 14px', color: '#334155', borderBottom: '1px solid #f1f5f9', whiteSpace: 'nowrap' },
-  empty: { display: 'flex', alignItems: 'center', gap: '10px', padding: '2rem', color: '#94a3b8', fontSize: '14px' },
-  emptyText: { color: '#94a3b8', padding: '1.5rem', fontSize: '14px', margin: 0 },
-  spinner: { width: '16px', height: '16px', border: '2px solid #e2e8f0', borderTop: '2px solid #3b82f6', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
-  btnEdit: { padding: '5px 12px', fontSize: '12px', fontWeight: '600', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer' },
+  th: { padding: '11px 14px', background: '#EEF1FB', color: '#06175D', fontWeight: '700', textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid #DDE0EE', fontSize: '12px', letterSpacing: '.3px' },
+  td: { padding: '10px 14px', color: '#1A1D3B', borderBottom: '1px solid #F0F2FA', whiteSpace: 'nowrap' },
+  empty: { display: 'flex', alignItems: 'center', gap: '10px', padding: '2rem', color: '#9599AE', fontSize: '14px' },
+  emptyText: { color: '#9599AE', padding: '1.5rem', fontSize: '14px', margin: 0 },
+  spinner: { width: '16px', height: '16px', border: '2px solid #DDE0EE', borderTop: '2px solid #06175D', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
+  btnEdit: { padding: '5px 12px', fontSize: '12px', fontWeight: '600', background: '#EEF1FB', color: '#06175D', border: '1px solid #DDE0EE', borderRadius: '6px', cursor: 'pointer' },
   btnDel: { padding: '5px 12px', fontSize: '12px', fontWeight: '600', background: '#fff', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '6px', cursor: 'pointer' },
   btnDanger: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  btnGhost: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' },
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modal: { background: '#fff', borderRadius: '12px', padding: '1.5rem', width: '560px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' },
+  btnGhost: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#F0F2FA', color: '#9599AE', border: '1px solid #DDE0EE', borderRadius: '6px', cursor: 'pointer' },
+  pagination: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderTop: '1px solid #F0F2FA' },
+  pageInfo: { fontSize: '12px', color: '#9599AE' },
+  pageBtn: { padding: '4px 10px', fontSize: '12px', fontWeight: '600', background: '#fff', color: '#9599AE', border: '1px solid #DDE0EE', borderRadius: '6px', cursor: 'pointer' },
+  pageBtnActive: { background: '#06175D', color: '#fff', borderColor: '#06175D' },
+  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,83,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
+  modal: { background: '#fff', borderRadius: '14px', padding: '1.75rem', width: '560px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(6,23,93,0.2)' },
 }

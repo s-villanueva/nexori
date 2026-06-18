@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { api } from '../api/client'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,23 +12,10 @@ export default function Registro() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  const [cargos, setCargos] = useState([])
-  const [roles, setRoles] = useState([])
-
   const [empresa, setEmpresa] = useState({ nombre: '', razon_social: '', nit: '', dominio: '' })
-  const [contacto, setContacto] = useState({ nombres: '', apellidos: '', idCargo: '' })
+  const [contacto, setContacto] = useState({ nombres: '', apellidos: '', cargo: '' })
   const [sucursal, setSucursal] = useState({ nombre: '', direccion: '' })
-  const [usuario, setUsuario] = useState({ nombre: '', email: '', password: '', idRol: '' })
-
-  useEffect(() => {
-    Promise.all([
-      api.get('/api/v1/cargos-empresa').catch(() => []),
-      api.get('/api/v1/roles').catch(() => []),
-    ]).then(([cargosData, rolesData]) => {
-      setCargos(cargosData || [])
-      setRoles(rolesData || [])
-    })
-  }, [])
+  const [usuario, setUsuario] = useState({ nombre: '', email: '', password: '' })
 
   const next = () => {
     setError('')
@@ -36,8 +23,8 @@ export default function Registro() {
       setError('Completa todos los datos de la empresa.')
       return
     }
-    if (step === 1 && (!contacto.nombres || !contacto.apellidos || !contacto.idCargo)) {
-      setError('Completa todos los datos del contacto.')
+    if (step === 1 && (!contacto.nombres || !contacto.apellidos)) {
+      setError('Completa los datos del contacto.')
       return
     }
     if (step === 2 && (!sucursal.nombre || !sucursal.direccion)) {
@@ -51,47 +38,34 @@ export default function Registro() {
 
   const handleSubmit = async () => {
     setError('')
-    if (!usuario.nombre || !usuario.email || !usuario.password || !usuario.idRol) {
-      setError('Completa los datos del usuario y selecciona un rol.')
+    if (!usuario.nombre || !usuario.email || !usuario.password) {
+      setError('Completa los datos del usuario.')
       return
     }
     setLoading(true)
     try {
-      const empresaCreada = await api.post('/api/v1/empresas', {
-        nombre: empresa.nombre,
-        razon_social: empresa.razon_social,
-        nit: empresa.nit,
-        dominio: empresa.dominio,
-        activo: true,
+      await api.post('/api/v1/auth/register', {
+        empresa: {
+          nombre:       empresa.nombre,
+          razon_social: empresa.razon_social,
+          nit:          empresa.nit,
+          dominio:      empresa.dominio,
+        },
+        contacto: {
+          nombres:   contacto.nombres,
+          apellidos: contacto.apellidos,
+          cargo:     contacto.cargo,
+        },
+        sucursal: {
+          nombre:    sucursal.nombre,
+          direccion: sucursal.direccion,
+        },
+        usuario: {
+          nombre:   usuario.nombre,
+          email:    usuario.email,
+          password: usuario.password,
+        },
       })
-      if (!empresaCreada?.id) throw new Error('No se obtuvo el ID de la empresa creada.')
-
-      await api.post('/api/v1/contactos-empresa', {
-        nombres: contacto.nombres,
-        apellidos: contacto.apellidos,
-        idCargoEmpresa: contacto.idCargo,
-        idEmpresa: empresaCreada.id,
-      })
-
-      const sucursalCreada = await api.post('/api/v1/sucursales-empresa', {
-        nombre: sucursal.nombre,
-        direccion: sucursal.direccion,
-        coordenadas: null,
-        activo: true,
-        idEmpresa: empresaCreada.id,
-      })
-      if (!sucursalCreada?.id) throw new Error('No se obtuvo el ID de la sucursal creada.')
-
-      await api.post('/api/v1/usuarios', {
-        nombre: usuario.nombre,
-        email: usuario.email,
-        password: usuario.password,
-        activo: true,
-        idEmpresa: empresaCreada.id,
-        idSucursal: sucursalCreada.id,
-        idRol: usuario.idRol,
-      })
-
       setSuccess(true)
     } catch (e) {
       setError(e.message || 'Error durante el registro.')
@@ -118,7 +92,7 @@ export default function Registro() {
         <div style={styles.logoRow}>
           <div style={styles.logoCircle}>
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <rect width="28" height="28" rx="8" fill="#1e293b" />
+              <rect width="28" height="28" rx="8" fill="#06175D" />
               <path d="M7 20L14 8L21 20H7Z" fill="white" opacity="0.9" />
             </svg>
           </div>
@@ -131,11 +105,11 @@ export default function Registro() {
         <div style={styles.stepper}>
           {STEPS.map((s, i) => (
             <div key={s} style={styles.stepItem}>
-              <div style={{ ...styles.stepCircle, background: i <= step ? '#1e293b' : '#e2e8f0', color: i <= step ? '#fff' : '#94a3b8' }}>
+              <div style={{ ...styles.stepCircle, background: i <= step ? '#06175D' : '#DDE0EE', color: i <= step ? '#fff' : '#9599AE' }}>
                 {i < step ? '✓' : i + 1}
               </div>
-              <span style={{ ...styles.stepLabel, color: i <= step ? '#0f172a' : '#94a3b8' }}>{s}</span>
-              {i < STEPS.length - 1 && <div style={{ ...styles.stepLine, background: i < step ? '#1e293b' : '#e2e8f0' }} />}
+              <span style={{ ...styles.stepLabel, color: i <= step ? '#1A1D3B' : '#9599AE' }}>{s}</span>
+              {i < STEPS.length - 1 && <div style={{ ...styles.stepLine, background: i < step ? '#06175D' : '#DDE0EE' }} />}
             </div>
           ))}
         </div>
@@ -157,13 +131,7 @@ export default function Registro() {
             <p style={styles.stepTitle}>Contacto principal</p>
             <Field label="Nombres" value={contacto.nombres} onChange={(v) => setContacto({ ...contacto, nombres: v })} placeholder="Ej: Ana" />
             <Field label="Apellidos" value={contacto.apellidos} onChange={(v) => setContacto({ ...contacto, apellidos: v })} placeholder="Ej: García" />
-            <div>
-              <label style={styles.label}>Cargo</label>
-              <select style={styles.input} value={contacto.idCargo} onChange={(e) => setContacto({ ...contacto, idCargo: e.target.value })}>
-                <option value="">Selecciona un cargo</option>
-                {cargos.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-              </select>
-            </div>
+            <Field label="Cargo (opcional)" value={contacto.cargo} onChange={(v) => setContacto({ ...contacto, cargo: v })} placeholder="Ej: Gerente General" />
           </div>
         )}
 
@@ -181,13 +149,9 @@ export default function Registro() {
             <Field label="Nombre completo" value={usuario.nombre} onChange={(v) => setUsuario({ ...usuario, nombre: v })} placeholder="Ej: Ana García" />
             <Field label="Email" value={usuario.email} onChange={(v) => setUsuario({ ...usuario, email: v })} placeholder="Ej: ana@techcorp.com" type="email" />
             <Field label="Contraseña" value={usuario.password} onChange={(v) => setUsuario({ ...usuario, password: v })} placeholder="••••••••" type="password" />
-            <div>
-              <label style={styles.label}>Rol del usuario</label>
-              <select style={styles.input} value={usuario.idRol} onChange={(e) => setUsuario({ ...usuario, idRol: e.target.value })}>
-                <option value="">Selecciona un rol</option>
-                {roles.map((r) => <option key={r.id} value={r.id}>{r.nombre}</option>)}
-              </select>
-            </div>
+            <p style={{ margin: 0, fontSize: '12px', color: '#9599AE' }}>
+              Tu cuenta será creada con rol de empresa compradora.
+            </p>
           </div>
         )}
 
@@ -203,7 +167,7 @@ export default function Registro() {
 
         <p style={styles.loginLink}>
           ¿Ya tenés cuenta?{' '}
-          <span style={{ color: '#1e293b', cursor: 'pointer', fontWeight: 600 }} onClick={() => navigate('/login')}>
+          <span style={{ color: '#06175D', cursor: 'pointer', fontWeight: 600 }} onClick={() => navigate('/login')}>
             Iniciá sesión
           </span>
         </p>
@@ -222,27 +186,27 @@ function Field({ label, value, onChange, placeholder, type = 'text' }) {
 }
 
 const styles = {
-  bg: { minHeight: '100vh', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  card: { background: '#fff', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '440px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' },
+  bg: { minHeight: '100vh', background: '#F0F2FA', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  card: { background: '#fff', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '440px', boxShadow: '0 4px 24px rgba(6,23,93,0.10)' },
   logoRow: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '2rem' },
   logoCircle: { width: '44px', height: '44px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0 },
-  logoTitle: { margin: 0, fontWeight: '700', fontSize: '15px', color: '#0f172a' },
-  logoSub: { margin: 0, fontSize: '12px', color: '#94a3b8' },
+  logoTitle: { margin: 0, fontWeight: '700', fontSize: '15px', color: '#06175D' },
+  logoSub: { margin: 0, fontSize: '12px', color: '#9599AE' },
   stepper: { display: 'flex', alignItems: 'center', marginBottom: '1.75rem' },
   stepItem: { display: 'flex', alignItems: 'center', flex: 1 },
   stepCircle: { width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '700', flexShrink: 0 },
   stepLabel: { fontSize: '11px', fontWeight: '500', marginLeft: '5px', whiteSpace: 'nowrap' },
   stepLine: { flex: 1, height: '2px', margin: '0 6px' },
-  stepTitle: { margin: '0 0 1rem', fontWeight: '600', fontSize: '15px', color: '#0f172a' },
+  stepTitle: { margin: '0 0 1rem', fontWeight: '600', fontSize: '15px', color: '#1A1D3B' },
   form: { display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.25rem' },
-  label: { display: 'block', fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '5px' },
-  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box', background: '#fff' },
+  label: { display: 'block', fontSize: '13px', fontWeight: '500', color: '#9599AE', marginBottom: '5px' },
+  input: { width: '100%', padding: '10px 12px', border: '1.5px solid #DDE0EE', borderRadius: '8px', fontSize: '14px', color: '#1A1D3B', outline: 'none', boxSizing: 'border-box', background: '#fff' },
   error: { color: '#dc2626', fontSize: '13px', marginBottom: '0.75rem', background: '#fef2f2', padding: '8px 12px', borderRadius: '6px' },
   navRow: { display: 'flex', gap: '8px', justifyContent: 'flex-end' },
-  backBtn: { padding: '10px 18px', border: '1.5px solid #e2e8f0', borderRadius: '8px', background: '#fff', fontSize: '14px', fontWeight: '500', color: '#64748b', cursor: 'pointer' },
-  submit: { padding: '10px 18px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', marginTop: '0.5rem' },
-  loginLink: { marginTop: '1.25rem', fontSize: '13px', color: '#94a3b8', textAlign: 'center' },
+  backBtn: { padding: '10px 18px', border: '1.5px solid #DDE0EE', borderRadius: '8px', background: '#fff', fontSize: '14px', fontWeight: '500', color: '#9599AE', cursor: 'pointer' },
+  submit: { padding: '10px 18px', background: '#06175D', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', marginTop: '0.5rem' },
+  loginLink: { marginTop: '1.25rem', fontSize: '13px', color: '#9599AE', textAlign: 'center' },
   successIcon: { width: '56px', height: '56px', borderRadius: '50%', background: '#dcfce7', color: '#166534', fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' },
-  successTitle: { margin: '0 0 6px', fontWeight: '700', fontSize: '20px', color: '#0f172a', textAlign: 'center' },
-  successSub: { margin: '0 0 1.5rem', fontSize: '14px', color: '#64748b', textAlign: 'center' },
+  successTitle: { margin: '0 0 6px', fontWeight: '700', fontSize: '20px', color: '#1A1D3B', textAlign: 'center' },
+  successSub: { margin: '0 0 1.5rem', fontSize: '14px', color: '#9599AE', textAlign: 'center' },
 }
