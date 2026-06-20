@@ -401,12 +401,12 @@ CREATE TABLE IF NOT EXISTS password_reset_token (
     email         TEXT        NOT NULL,
     code          VARCHAR(6)  NOT NULL,
     expires_at    TIMESTAMP   NOT NULL,
-    used          BOOLEAN     DEFAULT false,
-)
+    used          BOOLEAN     DEFAULT false
+);
 ------------------------------
 -- INDICES
 ------------------------------
-CREATE INDEX idx_password_reset_token  ON password_reset_token (id)
+CREATE INDEX idx_password_reset_token  ON password_reset_token (id);
 -- empresa
 CREATE INDEX idx_nit_empresa    ON empresa (nit);
 
