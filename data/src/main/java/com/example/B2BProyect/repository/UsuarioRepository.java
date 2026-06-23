@@ -1,7 +1,6 @@
 package com.example.B2BProyect.repository;
 
 import com.example.B2BProyect.repository.dto.response.UsuarioDTO;
-import com.example.B2BProyect.repository.entity.Log;
 import com.example.B2BProyect.repository.entity.Usuario;
 import com.example.B2BProyect.repository.proyecciones.UsuarioProjection;
 import org.springframework.data.domain.Page;
@@ -42,7 +41,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @Query("SELECT new " +
             "com.example.B2BProyect.repository.dto.response.UsuarioDTO(" +
-            "u.id, u.nombre, u.email, u.activo, u.idEmpresa.nombre, u.idSucursal.nombre, u.idRol.nombre)" +
+            "u.id, u.nombre, u.email, u.activo, u.idEmpresa.nombre, u.idSucursal.nombre, u.idRol.nombre, u.idEmpresa, u.idSucursal)" +
             " FROM Usuario u WHERE u.id = :pId")
     Optional<UsuarioDTO> findByIdDTO(@Param("pId") UUID pId);
 

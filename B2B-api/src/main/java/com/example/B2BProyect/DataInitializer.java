@@ -1,16 +1,24 @@
 package com.example.B2BProyect;
 
-
 import com.example.B2BProyect.job.EmailSenderJob;
 import com.example.B2BProyect.quartz.CronExpressionConstant;
 import com.example.B2BProyect.quartz.service.JobDto;
 import com.example.B2BProyect.quartz.service.JobService;
 import com.example.B2BProyect.quartz.service.JobUtil;
 import com.example.B2BProyect.repository.EmpresaRepository;
+import com.example.B2BProyect.repository.ProveedorRepository;
 import com.example.B2BProyect.repository.RolUsuarioRepository;
 import com.example.B2BProyect.repository.SucursalEmpresaRepository;
 import com.example.B2BProyect.repository.UsuarioRepository;
-import com.example.B2BProyect.repository.entity.*;
+import com.example.B2BProyect.repository.entity.DetalleOrden;
+import com.example.B2BProyect.repository.entity.Empresa;
+import com.example.B2BProyect.repository.entity.Factura;
+import com.example.B2BProyect.repository.entity.OrdenCompra;
+import com.example.B2BProyect.repository.entity.Producto;
+import com.example.B2BProyect.repository.entity.Proveedor;
+import com.example.B2BProyect.repository.entity.RolUsuario;
+import com.example.B2BProyect.repository.entity.SucursalEmpresa;
+import com.example.B2BProyect.repository.entity.Usuario;
 import com.example.B2BProyect.service.EmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +29,10 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -29,6 +40,7 @@ import java.util.*;
 public class DataInitializer implements CommandLineRunner {
     private final RolUsuarioRepository rolUsuarioRepository;
     private final EmpresaRepository empresaRepository;
+    private final ProveedorRepository proveedorRepository;
     private final SucursalEmpresaRepository sucursalEmpresaRepository;
     private final UsuarioRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,10 +51,10 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         init();
 
-        JobDto jobDto = EmailSenderJob.getJobDto(JobUtil.GROUP_NAME);
-        if (!jobService.existJobName(jobDto.getGroupName(), jobDto.getJobName())){
-            jobService.scheduleCronJob(jobDto, new Date(), CronExpressionConstant.CRON_START_NOW, null, "Este Job envia correos");
-        }
+//        JobDto jobDto = EmailSenderJob.getJobDto(JobUtil.GROUP_NAME);
+//        if (!jobService.existJobName(jobDto.getGroupName(), jobDto.getJobName())){
+//            jobService.scheduleCronJob(jobDto, new Date(), CronExpressionConstant.CRON_START_NOW, null, "Este Job envia correos");
+//        }
 
 //        emailService.sendPassword("santiagovillanueva1@upb.edu","123546");
         Factura factura = new Factura();
@@ -82,55 +94,114 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void init() {
-        if (userRepository.count() == 0 ) {
-            RolUsuario rolAdmin = rolUsuarioRepository.findAll()
-                    .stream()
-                    .filter(r -> r.getNombre().equals("ADMIN"))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        RolUsuario nuevo = new RolUsuario();
-                        nuevo.setNombre("ADMIN");
-                        nuevo.setDescripcion("Administrador del sistema");
-                        return rolUsuarioRepository.save(nuevo);
-                    });
+        RolUsuario rolAdmin = ensureRole("admin", "Administrador del sistema");
+        RolUsuario rolProveedor = ensureRole("proveedor", "Usuario proveedor");
+        RolUsuario rolEmpresa = ensureRole("empresa", "Usuario empresa compradora");
 
-            Empresa empresa = empresaRepository.findAll()
-                    .stream()
-                    .filter(e -> e.getNombre().equals("Empresa Root"))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        Empresa nueva = new Empresa();
-                        nueva.setNombre("Cuanto Menos");
-                        nueva.setNit("0000000000");
-                        nueva.setRazonSocial("B2B Cuanto Menos");
-                        nueva.setDominio("cuantomenos.com"); // ?? xd
-                        nueva.setActivo(true);
-                        return empresaRepository.save(nueva);
-                    });
+        Empresa empresaAdmin = ensureEmpresa(
+                "B2B Admin Demo",
+                "0000000000",
+                "B2B Admin Demo",
+                "admin.demo");
+        SucursalEmpresa sucursalAdmin = ensureSucursal(
+                empresaAdmin,
+                "Sucursal Admin Demo",
+                "Av. Principal 100");
+        ensureUser("Admin Demo", "admin@b2b.test", "Abc123**", rolAdmin, empresaAdmin, sucursalAdmin);
+        ensureUser("root", "root@upb.com", "Abc123**", rolAdmin, empresaAdmin, sucursalAdmin);
 
-            SucursalEmpresa sucursal = sucursalEmpresaRepository.findAll()
-                    .stream()
-                    .filter(s -> s.getNombre().equals("Sucursal Principal"))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        SucursalEmpresa nueva = new SucursalEmpresa();
-                        nueva.setNombre("Sucursal Principal");
-                        nueva.setDireccion("Dirección principal");
-                        nueva.setActivo(true);
-                        nueva.setIdEmpresa(empresa); // la recién creada
-                        return sucursalEmpresaRepository.save(nueva);
-                    });
+        Empresa empresaProveedor = ensureEmpresa(
+                "Proveedor Demo SRL",
+                "1234567890",
+                "Proveedor Demo Sociedad de Responsabilidad Limitada",
+                "proveedor.demo");
+        SucursalEmpresa sucursalProveedor = ensureSucursal(
+                empresaProveedor,
+                "Sucursal Proveedor Demo",
+                "Parque Industrial, Modulo 12");
+        ensureProveedor(empresaProveedor);
+        ensureUser("Proveedor Demo", "proveedor@b2b.test", "Abc123**", rolProveedor, empresaProveedor, sucursalProveedor);
 
-            Usuario root = userRepository.save(Usuario.builder()
-                    .nombre("root")
-                    .email("root@upb.com")
-                    .idRol(rolAdmin) // hay que ver cómo manejar esto
-                    .activo(Boolean.TRUE)
-                    .passwordHash(passwordEncoder.encode("Abc123**"))
-                            .idEmpresa(empresa)
-                            .idSucursal(sucursal)
-                    .build());
-            userRepository.save(root);
-        }
+        Empresa empresaCompradora = ensureEmpresa(
+                "Empresa Compradora Demo SA",
+                "9876543210",
+                "Empresa Compradora Demo Sociedad Anonima",
+                "compradora.demo");
+        SucursalEmpresa sucursalEmpresa = ensureSucursal(
+                empresaCompradora,
+                "Sucursal Empresa Demo",
+                "Av. Comercio 245");
+        ensureUser("Empresa Demo", "empresa@b2b.test", "Abc123**", rolEmpresa, empresaCompradora, sucursalEmpresa);
+    }
+
+    private RolUsuario ensureRole(String nombre, String descripcion) {
+        return rolUsuarioRepository.findAll()
+                .stream()
+                .filter(rol -> rol.getNombre().equalsIgnoreCase(nombre))
+                .findFirst()
+                .orElseGet(() -> {
+                    RolUsuario rol = new RolUsuario();
+                    rol.setNombre(nombre);
+                    rol.setDescripcion(descripcion);
+                    return rolUsuarioRepository.save(rol);
+                });
+    }
+
+    private Empresa ensureEmpresa(String nombre, String nit, String razonSocial, String dominio) {
+        return empresaRepository.findAll()
+                .stream()
+                .filter(empresa -> empresa.getNombre().equals(nombre))
+                .findFirst()
+                .orElseGet(() -> {
+                    Empresa empresa = new Empresa();
+                    empresa.setNombre(nombre);
+                    empresa.setNit(nit);
+                    empresa.setRazonSocial(razonSocial);
+                    empresa.setDominio(dominio);
+                    empresa.setActivo(true);
+                    return empresaRepository.save(empresa);
+                });
+    }
+
+    private SucursalEmpresa ensureSucursal(Empresa empresa, String nombre, String direccion) {
+        return sucursalEmpresaRepository.findAll()
+                .stream()
+                .filter(sucursal -> sucursal.getNombre().equals(nombre)
+                        && sucursal.getIdEmpresa().getId().equals(empresa.getId()))
+                .findFirst()
+                .orElseGet(() -> {
+                    SucursalEmpresa sucursal = new SucursalEmpresa();
+                    sucursal.setNombre(nombre);
+                    sucursal.setDireccion(direccion);
+                    sucursal.setActivo(true);
+                    sucursal.setIdEmpresa(empresa);
+                    return sucursalEmpresaRepository.save(sucursal);
+                });
+    }
+
+    private Proveedor ensureProveedor(Empresa empresa) {
+        return proveedorRepository.findAll()
+                .stream()
+                .filter(proveedor -> proveedor.getIdEmpresa().getId().equals(empresa.getId()))
+                .findFirst()
+                .orElseGet(() -> {
+                    Proveedor proveedor = new Proveedor();
+                    proveedor.setActivo(true);
+                    proveedor.setIdEmpresa(empresa);
+                    return proveedorRepository.save(proveedor);
+                });
+    }
+
+    private Usuario ensureUser(String nombre, String email, String password, RolUsuario rol, Empresa empresa, SucursalEmpresa sucursal) {
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> userRepository.save(Usuario.builder()
+                        .nombre(nombre)
+                        .email(email)
+                        .idRol(rol)
+                        .activo(Boolean.TRUE)
+                        .passwordHash(passwordEncoder.encode(password))
+                        .idEmpresa(empresa)
+                        .idSucursal(sucursal)
+                        .build()));
     }
 }

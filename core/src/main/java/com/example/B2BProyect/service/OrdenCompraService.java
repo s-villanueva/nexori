@@ -2,10 +2,10 @@ package com.example.B2BProyect.service;
 
 import com.example.B2BProyect.repository.OrdenCompraRepository;
 import com.example.B2BProyect.repository.dto.request.OrdenCompraRequest;
+import com.example.B2BProyect.repository.dto.request.OrdenUpdateRequest;
 import com.example.B2BProyect.repository.dto.response.OrdenCompraDTO;
-import com.example.B2BProyect.repository.entity.Empresa;
+import com.example.B2BProyect.repository.dto.response.OrdenEmpresaStats;
 import com.example.B2BProyect.repository.entity.OrdenCompra;
-import com.example.B2BProyect.service.exception.EmpresasException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,8 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Slf4j
 @Service
@@ -38,16 +36,16 @@ public class OrdenCompraService {
         orden.setFecha(request.getFecha());
         orden.setFechaOrden(request.getFechaOrden());
         orden.setId(idempotency);
+        orden.setVersion(request.getVersion());
+        ordenCompraRepository.existsById(idempotency);
         log.info("ORDEN A GUARDAR: " + orden.getId());
         orden.setIdEstado(request.getIdEstado() != null ? request.getIdEstado() : "pendiente");
-        if (request.getIdProveedor() != null)
-            proveedorService.findById(request.getIdProveedor()).ifPresent(orden::setIdProveedor);
-        if (request.getIdEmpresaCompradora() != null)
-            empresaService.findById(request.getIdEmpresaCompradora()).ifPresent(orden::setIdEmpresaCompradora);
-        if (request.getIdSucursal() != null)
-            sucursalEmpresaService.findById(request.getIdSucursal()).ifPresent(orden::setIdSucursal);
-        if (request.getIdUsuario() != null)
-            usuarioService.findById(request.getIdUsuario()).ifPresent(orden::setIdUsuario);
+        if (request.getIdUsuario() != null) {
+            orden.setIdUsuario(usuarioService.findById(request.getIdUsuario()).orElseThrow());
+            orden.setIdEmpresaCompradora(orden.getIdUsuario().getIdEmpresa());
+            orden.setIdSucursal(orden.getIdUsuario().getIdSucursal());
+        }
+        orden.setIdProveedor(proveedorService.findById(request.getIdProveedor()).orElseThrow());
         return new OrdenCompraDTO(ordenCompraRepository.save(orden));
     }
 
@@ -60,6 +58,11 @@ public class OrdenCompraService {
     public Optional<OrdenCompra> findById(UUID id) {
         return ordenCompraRepository.findById(id);
     }
+    @Transactional
+    public void updateStatus(OrdenUpdateRequest ordenUpdateRequest){
+        OrdenCompra ordenCompra = ordenCompraRepository.findById(ordenUpdateRequest.getId()).orElseThrow();
+        ordenCompra.setIdEstado(ordenUpdateRequest.getIdEstado());
+    }
 
     @Transactional
     public Optional<OrdenCompraDTO> update(UUID id, OrdenCompraRequest dto) {
@@ -70,12 +73,15 @@ public class OrdenCompraService {
             if (dto.getIdEstado() != null)   orden.setIdEstado(dto.getIdEstado());
             if (dto.getIdProveedor() != null)
                 proveedorService.findById(dto.getIdProveedor()).ifPresent(orden::setIdProveedor);
-            if (dto.getIdEmpresaCompradora() != null)
-                empresaService.findById(dto.getIdEmpresaCompradora()).ifPresent(orden::setIdEmpresaCompradora);
-            if (dto.getIdSucursal() != null)
-                sucursalEmpresaService.findById(dto.getIdSucursal()).ifPresent(orden::setIdSucursal);
-            if (dto.getIdUsuario() != null)
-                usuarioService.findById(dto.getIdUsuario()).ifPresent(orden::setIdUsuario);
+//            if (dto.getIdEmpresaCompradora() != null)
+//                empresaService.findById(dto.getIdEmpresaCompradora()).ifPresent(orden::setIdEmpresaCompradora);
+//            if (dto.getIdSucursal() != null)
+//                sucursalEmpresaService.findById(dto.getIdSucursal()).ifPresent(orden::setIdSucursal);
+            if (dto.getIdUsuario() != null){
+                orden.setIdUsuario(usuarioService.findById(dto.getIdUsuario()).orElseThrow());
+                orden.setIdEmpresaCompradora(orden.getIdUsuario().getIdEmpresa());
+                orden.setIdSucursal(orden.getIdUsuario().getIdSucursal());
+            }
             return new OrdenCompraDTO(ordenCompraRepository.save(orden));
         });
     }
@@ -88,8 +94,25 @@ public class OrdenCompraService {
     }
 
     @Transactional(readOnly = true)
+    public Page<OrdenCompraDTO> findByEmpresaCompradora(UUID idEmpresa, Integer size, Integer page){
+        log.info("ID " + idEmpresa);
+        return ordenCompraRepository.retrieveAllFromEmpresaCompradora(idEmpresa, PageRequest.of(page, size));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrdenCompraDTO> findByEmpresaProveedora(UUID idEmpresa, Integer size, Integer page){
+        log.info("ID " + idEmpresa);
+        return ordenCompraRepository.retrieveAllFromEmpresaProveedora(idEmpresa, PageRequest.of(page, size));
+    }
+
+    @Transactional(readOnly = true)
     public Page<OrdenCompraDTO> findAllPaged(int page, int size) {
         return ordenCompraRepository.findAll(PageRequest.of(page, size)).map(OrdenCompraDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public OrdenEmpresaStats retrieveStats(UUID id){
+        return ordenCompraRepository.obtenerStats(id);
     }
 
     @Transactional(readOnly = true)

@@ -3,8 +3,11 @@ package com.example.B2BProyect.service;
 import com.example.B2BProyect.repository.ContratoEmpresaDetalleRepository;
 import com.example.B2BProyect.repository.dto.request.ContratoEmpresaDetalleRequest;
 import com.example.B2BProyect.repository.dto.response.ContratoEmpresaDetalleDTO;
+import com.example.B2BProyect.repository.dto.response.ContratoEmpresaStats;
 import com.example.B2BProyect.repository.entity.ContratoEmpresaDetalle;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,18 @@ public class ContratoEmpresaDetalleService {
     @Transactional(readOnly = true)
     public List<ContratoEmpresaDetalleDTO> findAll() {
         return contratoEmpresaDetalleRepository.findAll().stream().map(ContratoEmpresaDetalleDTO::new).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ContratoEmpresaDetalleDTO> findAllByEmpresa(UUID idEmpresa, Integer page, Integer size){
+        Page<ContratoEmpresaDetalleDTO> empresaDetalleDTOS =contratoEmpresaDetalleRepository.findAllByIdContratoIdEmpresaId(idEmpresa, PageRequest.of(page,size));
+//        empresaDetalleDTOS.forEach(dto -> System.out.println(dto));
+        return empresaDetalleDTOS;
+    }
+
+    @Transactional(readOnly = true)
+    public ContratoEmpresaStats retrieveStatsFromEmpresa(UUID idEmpresa){
+        return contratoEmpresaDetalleRepository.findStatsForEmpresa(idEmpresa);
     }
 
     @Transactional(readOnly = true)

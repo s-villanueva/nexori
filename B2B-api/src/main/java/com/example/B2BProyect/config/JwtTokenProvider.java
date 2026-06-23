@@ -63,8 +63,8 @@ public class JwtTokenProvider implements Serializable {
 
         return OKAuthDto.builder()
                 .accessToken(token)
-                .idToken(token)
-                .refreshToken(token)
+//                .idToken(token)
+//                .refreshToken(token)
                 .tokenType("bearer")
                 .expiresIn(this.validityInMinutes)
                 .expiresAt(validity.getTime())

@@ -1,11 +1,13 @@
 package com.example.B2BProyect.controller;
 
+import com.example.B2BProyect.repository.entity.Proveedor;
 import com.example.B2BProyect.service.exception.OperationException;
 import com.example.B2BProyect.repository.dto.request.ProveedorRequest;
 import com.example.B2BProyect.repository.dto.response.ProveedorDTO;
 import com.example.B2BProyect.service.ProveedorService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,23 @@ import java.util.UUID;
 public class ProveedorController {
     private final ProveedorService proveedorService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ProveedorDTO>> findAll() {
         try {
             return ResponseEntity.ok(proveedorService.findAll());
+        } catch (OperationException e) {
+            log.error("Error llamando a los proveedores: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("Error llamando a los proveedores", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al listar proveedores");
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ProveedorDTO>> findAllPaged(@RequestParam Integer page, @RequestParam Integer size) {
+        try {
+            return ResponseEntity.ok(proveedorService.findAllPaged(page, size));
         } catch (OperationException e) {
             log.error("Error llamando a los proveedores: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

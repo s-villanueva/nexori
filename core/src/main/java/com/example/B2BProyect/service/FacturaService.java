@@ -3,6 +3,7 @@ package com.example.B2BProyect.service;
 import com.example.B2BProyect.repository.FacturaRepository;
 import com.example.B2BProyect.repository.dto.request.FacturaRequest;
 import com.example.B2BProyect.repository.dto.response.FacturaDTO;
+import com.example.B2BProyect.repository.dto.response.FacturaEmpresaStats;
 import com.example.B2BProyect.repository.entity.Factura;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,16 @@ public class FacturaService {
         return facturaRepository.findById(id);
     }
 
+    @Transactional(readOnly = true)
+    public FacturaEmpresaStats retrieveStats(UUID idEmpresa){
+        return facturaRepository.getStatsByEmpresa(idEmpresa);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FacturaDTO> retrieveFacturasByEmpresa(UUID idEmpresa, int page, int size){
+        return facturaRepository.findAllForEmpresa(idEmpresa, PageRequest.of(page,size));
+    }
+
     @Transactional
     public Optional<FacturaDTO> update(UUID id, FacturaRequest dto) {
         return facturaRepository.findById(id).map(factura -> {
@@ -64,6 +76,11 @@ public class FacturaService {
 
     @Transactional(readOnly = true)
     public Page<FacturaDTO> findAllPaged(int page, int size) {
+        return facturaRepository.findAll(PageRequest.of(page, size)).map(FacturaDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FacturaDTO> findAllEmpresa(int page, int size) {
         return facturaRepository.findAll(PageRequest.of(page, size)).map(FacturaDTO::new);
     }
 

@@ -13,5 +13,5 @@ public class TarifaReglaRequest {
     private String nombre;
     private String descripcion;
     private Boolean activo;
-    private UUID idProveedor;
+    private UUID idEmpresa;
 }

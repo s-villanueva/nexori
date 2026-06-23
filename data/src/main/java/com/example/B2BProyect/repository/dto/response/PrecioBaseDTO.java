@@ -19,6 +19,18 @@ public class PrecioBaseDTO {
     private Instant vigenteHasta;
     private String nombreProveedor;
     private String nombreProducto;
+    private String sku;
+
+    public PrecioBaseDTO(UUID id, BigDecimal precioBase, Instant vigenteDesde, Instant vigenteHasta, String nombreProveedor, String nombreProducto, String sku) {
+        this.id = id;
+        this.precioBase = precioBase;
+        this.vigenteDesde = vigenteDesde;
+        this.vigenteHasta = vigenteHasta;
+        this.nombreProveedor = nombreProveedor;
+        this.nombreProducto = nombreProducto;
+        this.sku = sku;
+    }
+
     private ProveedorDTO idProveedor;
     private ProductoDTO idProducto;
 

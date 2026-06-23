@@ -48,4 +48,17 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
 
     List<Producto> findByIdProveedorId(UUID idProveedor);
 
+    @Query("""
+SELECT new com.example.B2BProyect.repository.dto.response.ProductoDTO(
+    pr.sku,
+    pr.nombre,
+    pr.descripcion,
+    pr.unidadMedida,
+    pb.precioBase
+)
+FROM Producto pr
+JOIN PrecioBase pb ON pr.id = pb.idProducto.id
+WHERE pr.idProveedor.idEmpresa.id = :pIdEmpresa
+""")
+    Page<ProductoDTO> findAllByEmpresa(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
 }

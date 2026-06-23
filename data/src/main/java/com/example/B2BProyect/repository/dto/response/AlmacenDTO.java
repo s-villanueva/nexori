@@ -5,6 +5,7 @@ import com.example.B2BProyect.repository.entity.Proveedor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.geo.Point;
 
 import java.awt.*;
@@ -13,12 +14,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
 public class AlmacenDTO {
     private UUID id;
     private String nombre;
     private String direccion;
     private Point coordenadas;
-    private boolean activo;
+    private Boolean activo;
     private String nombreProveedor;
 
     private ProveedorDTO idProveedor;
@@ -50,5 +52,13 @@ public class AlmacenDTO {
         this.activo = activo;
         this.coordenadas = coordenadas;
         this.idProveedor = new ProveedorDTO(idProveedor);
+    }
+
+    public AlmacenDTO(UUID id, String nombre, String direccion, Boolean activo) {
+        this.id = id;
+        this.nombre = nombre;
+        this.direccion = direccion;
+//        this.coordenadas = new Point(x,y);
+        this.activo = activo;
     }
 }

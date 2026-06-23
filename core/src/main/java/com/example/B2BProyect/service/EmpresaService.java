@@ -49,6 +49,8 @@ public class EmpresaService {
         return empresaRepository.findById(id);
     }
 
+
+
     @Transactional(readOnly = true)
     public Optional<EmpresaDTO> findByIdDTO(UUID id) {
         return empresaRepository.findByIdDTO(id);

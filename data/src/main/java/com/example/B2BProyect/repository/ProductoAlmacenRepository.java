@@ -45,4 +45,23 @@ public interface ProductoAlmacenRepository extends JpaRepository<ProductoAlmacen
             " pa.almacen.nombre, pa.producto.nombre)" +
             " FROM ProductoAlmacen pa")
     List<ProductoAlmacenDTO> findAllDTO();
+
+    @Query("""
+SELECT new com.example.B2BProyect.repository.dto.response.ProductoAlmacenDTO(
+    pa.stock,
+    pa.max,
+    pa.min,
+    pa.activo,
+    pa.almacen.nombre,
+    pa.producto.nombre,
+    pa.almacen.idProveedor.id,
+    pr.precioBase
+)
+FROM ProductoAlmacen pa
+JOIN PrecioBase pr
+    ON pr.idProducto = pa.producto
+   AND pr.idProveedor = pa.producto.idProveedor
+WHERE pa.producto.sku = :productoSku
+""")
+    List<ProductoAlmacenDTO> findAllByProductoSku(@Param("productoSku") String productoSku);
 }

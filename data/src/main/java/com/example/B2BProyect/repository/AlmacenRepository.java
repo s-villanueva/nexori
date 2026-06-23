@@ -30,4 +30,11 @@ public interface AlmacenRepository extends JpaRepository<Almacen, UUID> {
             "a.activo, a.idProveedor.idEmpresa.nombre) " +
             " FROM Almacen a WHERE a.id=:pId")
     Optional<AlmacenDTO> findByIdDTO(@Param("pId") UUID pId);
+
+    List<Almacen> findAllByIdProveedor_IdEmpresaId(UUID idProveedorIdEmpresaId);
+
+    @Query("SELECT new com.example.B2BProyect.repository.dto.response.AlmacenDTO(" +
+            "a.id, a.nombre, a.direccion, a.activo) " +
+            "FROM Almacen a WHERE a.idProveedor.idEmpresa.id = :pIdEmpresa")
+    List<AlmacenDTO> findAllByIdProveedorIdEmpresaId(@Param("pIdEmpresa") UUID pIdEmpresa);
 }

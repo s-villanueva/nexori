@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.*;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +17,8 @@ public class ContratoEmpresaDetalleDTO {
     private BigDecimal porcentajeDescuento;
     private String nombreProducto;
     private String nombreContrato;
+    private Instant vigenteDesde;
+    private Instant vigenteHasta;
     private ProductoDTO idProducto;
     private ContratoEmpresaTarifasDTO idContrato;
 
@@ -32,6 +35,18 @@ public class ContratoEmpresaDetalleDTO {
         this.porcentajeDescuento = porcentajeDescuento;
         this.nombreProducto = nombreProducto;
         this.nombreContrato = nombreContrato;
+    }
+
+//"cd.id, cd.porcentajeDescuento, cd.idProducto.nombre, cd.idContrato.idRegla.nombre, cd.idContrato.vigenteDesde, cd.idContrato.vigenteHasta)" +
+
+    public ContratoEmpresaDetalleDTO(UUID id, BigDecimal porcentajeDescuento,
+                                     String nombreProducto, String nombreContrato, Instant vigenteDesde, Instant vigenteHasta) {
+        this.id = id;
+        this.porcentajeDescuento = porcentajeDescuento;
+        this.nombreProducto = nombreProducto;
+        this.nombreContrato = nombreContrato;
+        this.vigenteHasta = vigenteHasta;
+        this.vigenteDesde = vigenteDesde;
     }
 
     public ContratoEmpresaDetalleDTO(UUID id, BigDecimal porcentajeDescuento,

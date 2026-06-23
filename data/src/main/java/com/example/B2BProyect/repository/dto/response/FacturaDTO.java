@@ -16,7 +16,6 @@ public class FacturaDTO {
     private Instant fecha;
     private BigDecimal total;
     private String idEstado;
-    private UUID idOrdenId;
     private OrdenCompraDTO idOrden;
 
     public FacturaDTO(Factura factura) {
@@ -27,12 +26,11 @@ public class FacturaDTO {
         this.idOrden = new OrdenCompraDTO(factura.getIdOrden());
     }
 
-    public FacturaDTO(UUID id, Instant fecha, BigDecimal total, String idEstado, UUID idOrdenId) {
+    public FacturaDTO(UUID id, Instant fecha, BigDecimal total, String idEstado) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
         this.idEstado = idEstado;
-        this.idOrdenId = idOrdenId;
     }
 
     public FacturaDTO(UUID id, Instant fecha, BigDecimal total, String idEstado, OrdenCompra idOrden) {
@@ -41,5 +39,16 @@ public class FacturaDTO {
         this.total = total;
         this.idEstado = idEstado;
         this.idOrden = new OrdenCompraDTO(idOrden);
+    }
+
+    @Override
+    public String toString() {
+        return "FacturaDTO{" +
+                "id=" + id +
+                ", fecha=" + fecha +
+                ", total=" + total +
+                ", idEstado='" + idEstado + '\'' +
+                ", idOrden=" + idOrden +
+                '}';
     }
 }

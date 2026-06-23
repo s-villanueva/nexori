@@ -7,6 +7,7 @@ import com.example.B2BProyect.service.PrecioBaseService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,19 @@ public class PrecioBaseController {
     public ResponseEntity<List<PrecioBaseDTO>> findAll() {
         try {
             return ResponseEntity.ok(precioBaseService.findAll());
+        } catch (OperationException e) {
+            log.error("OperationException: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("Error listando precio base: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico");
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<PrecioBaseDTO>> findAllofProvider(@RequestParam String idEmpresa, @RequestParam Integer page, @RequestParam Integer size) {
+        try {
+            return ResponseEntity.ok(precioBaseService.findAllofProvider(UUID.fromString(idEmpresa), page,size));
         } catch (OperationException e) {
             log.error("OperationException: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

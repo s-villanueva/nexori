@@ -5,6 +5,8 @@ import com.example.B2BProyect.repository.dto.request.ProveedorRequest;
 import com.example.B2BProyect.repository.dto.response.ProveedorDTO;
 import com.example.B2BProyect.repository.entity.Proveedor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +29,22 @@ public class ProveedorService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ProveedorDTO> findAllPaged(Integer page, Integer size) {
+        return proveedorRepository.findAllByEmpresa(PageRequest.of(page, size));
+    }
+    @Transactional(readOnly = true)
     public List<ProveedorDTO> findAll() {
-        return proveedorRepository.findAll().stream().map(ProveedorDTO::new).toList();
+        return proveedorRepository.findAllDTO();
     }
 
     @Transactional(readOnly = true)
     public Optional<Proveedor> findById(UUID id) {
         return proveedorRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Proveedor findByIdEmpresa(UUID id) {
+        return proveedorRepository.findByIdEmpresaId((id)).orElseThrow();
     }
 
     @Transactional(readOnly = true)

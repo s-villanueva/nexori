@@ -1,6 +1,6 @@
 services:
   db:
-    build: .
+    build:
     environment:
       POSTGRES_DB: b2b_proyecto
       POSTGRES_USER: "owner"

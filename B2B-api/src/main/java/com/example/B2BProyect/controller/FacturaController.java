@@ -2,6 +2,7 @@ package com.example.B2BProyect.controller;
 
 import com.example.B2BProyect.repository.dto.request.FacturaRequest;
 import com.example.B2BProyect.repository.dto.response.FacturaDTO;
+import com.example.B2BProyect.repository.dto.response.FacturaEmpresaStats;
 import com.example.B2BProyect.service.FacturaService;
 import org.springframework.data.domain.Page;
 
@@ -22,12 +23,34 @@ import java.util.UUID;
 public class FacturaController {
     private final FacturaService facturaService;
 
-    @GetMapping
-    public ResponseEntity<List<FacturaDTO>> findAll() {
+//    @GetMapping
+//    public ResponseEntity<List<FacturaDTO>> findAll() {
+//        try {
+//            List<FacturaDTO> facturaDTOS = facturaService.findAll();
+//            System.out.println(facturaDTOS);
+//            return ResponseEntity.ok(facturaDTOS);
+//        } catch (Exception e) {
+//            log.error("Error listando factura: {}", e.getMessage());
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+
+    @GetMapping()
+    public ResponseEntity<Page<FacturaDTO>> findAllByEmpresa(@RequestParam String idEmpresa, @RequestParam Integer page, @RequestParam Integer size){
         try {
-            return ResponseEntity.ok(facturaService.findAll());
-        } catch (Exception e) {
-            log.error("Error listando factura: {}", e.getMessage());
+            return ResponseEntity.ok(facturaService.retrieveFacturasByEmpresa(UUID.fromString(idEmpresa), page, size));
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<FacturaEmpresaStats> retrieveStats(@RequestParam String idEmpresa){
+        try {
+           return ResponseEntity.ok(facturaService.retrieveStats(UUID.fromString(idEmpresa)));
+        } catch (Exception e){
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

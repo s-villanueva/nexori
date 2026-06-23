@@ -36,6 +36,15 @@ public class ProductoAlmacenController {
         }
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ProductoAlmacenDTO>> findBySku(@RequestParam String sku){
+        try {
+            return ResponseEntity.ok(productoAlmacenService.findBySku(sku));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @GetMapping("/almacen/{idAlmacen}")
     public ResponseEntity<List<ProductoAlmacenDTO>> findByAlmacen(@PathVariable UUID idAlmacen) {
         try {

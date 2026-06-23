@@ -2,7 +2,9 @@ package com.example.B2BProyect.controller;
 
 import com.example.B2BProyect.integracion.*;
 import com.example.B2BProyect.repository.dto.request.OrdenCompraRequest;
+import com.example.B2BProyect.repository.dto.request.OrdenUpdateRequest;
 import com.example.B2BProyect.repository.dto.response.OrdenCompraDTO;
+import com.example.B2BProyect.repository.dto.response.OrdenEmpresaStats;
 import com.example.B2BProyect.repository.entity.Empresa;
 import com.example.B2BProyect.repository.entity.Proveedor;
 import com.example.B2BProyect.repository.entity.Usuario;
@@ -28,12 +30,32 @@ import java.util.UUID;
 public class OrdenCompraController {
     private final OrdenCompraService ordenCompraService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<OrdenCompraDTO>> findAll() {
         try {
             return ResponseEntity.ok(ordenCompraService.findAll());
         } catch (Exception e) {
             log.error("Error listando orden compra: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/supplier")
+    public ResponseEntity<Page<OrdenCompraDTO>> findByEmpresaProveedora(@RequestParam String idEmpresa, @RequestParam Integer size, @RequestParam Integer page){
+        try{
+            return ResponseEntity.ok(ordenCompraService.findByEmpresaProveedora(UUID.fromString(idEmpresa), size, page));
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/buyer")
+    public ResponseEntity<Page<OrdenCompraDTO>> findByEmpresaCompradora(@RequestParam String idEmpresa, @RequestParam Integer size, @RequestParam Integer page){
+        try{
+            return ResponseEntity.ok(ordenCompraService.findByEmpresaCompradora(UUID.fromString(idEmpresa), size, page));
+        } catch (Exception e){
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
@@ -62,6 +84,7 @@ public class OrdenCompraController {
     public ResponseEntity<OrdenCompraDTO> save(@RequestBody OrdenCompraRequest dto) {
         UUID idempotency = UUID.randomUUID();
         try {
+            log.info(String.valueOf(dto));
             OrdenCompraDTO created = ordenCompraService.save(dto, idempotency);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (Exception e) {
@@ -82,6 +105,16 @@ public class OrdenCompraController {
         }
     }
 
+    @PostMapping("/update-status")
+    public ResponseEntity<Void> updateStatus(@RequestBody OrdenUpdateRequest ordenUpdateRequest){
+        try{
+            ordenCompraService.updateStatus(ordenUpdateRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e){
+            throw e;
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         try {
@@ -90,6 +123,15 @@ public class OrdenCompraController {
                     : ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Error eliminando orden compra: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/stats")
+    public ResponseEntity<OrdenEmpresaStats> retrieveStats(
+            @RequestParam String idEmpresa){
+        try {
+            return ResponseEntity.ok(ordenCompraService.retrieveStats(UUID.fromString(idEmpresa)));
+        } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }

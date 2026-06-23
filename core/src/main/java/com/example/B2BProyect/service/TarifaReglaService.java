@@ -26,8 +26,8 @@ public class TarifaReglaService {
         tarifaRegla.setNombre(request.getNombre());
         tarifaRegla.setDescripcion(request.getDescripcion());
         tarifaRegla.setActivo(request.getActivo() != null ? request.getActivo() : true);
-        if (request.getIdProveedor() != null)
-            proveedorService.findById(request.getIdProveedor()).ifPresent(tarifaRegla::setIdProveedor);
+        if (request.getIdEmpresa() != null)
+            tarifaRegla.setIdProveedor(proveedorService.findByIdEmpresa(request.getIdEmpresa()));
         return new TarifaReglaDTO(tarifaReglaRepository.save(tarifaRegla));
     }
 
@@ -47,8 +47,8 @@ public class TarifaReglaService {
             if (dto.getNombre() != null)      tarifa.setNombre(dto.getNombre());
             if (dto.getDescripcion() != null) tarifa.setDescripcion(dto.getDescripcion());
             if (dto.getActivo() != null)      tarifa.setActivo(dto.getActivo());
-            if (dto.getIdProveedor() != null)
-                proveedorService.findById(dto.getIdProveedor()).ifPresent(tarifa::setIdProveedor);
+            if (dto.getIdEmpresa() != null)
+                tarifa.setIdProveedor(proveedorService.findByIdEmpresa(dto.getIdEmpresa()));
             return new TarifaReglaDTO(tarifaReglaRepository.save(tarifa));
         });
     }

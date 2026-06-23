@@ -12,6 +12,7 @@ import com.example.B2BProyect.service.EmailService;
 import com.example.B2BProyect.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,7 +41,6 @@ public class UsuarioController {
     private final EmpresaRepository empresaRepository;
     private final SucursalEmpresaRepository sucursalRepository;
     private final RolUsuarioRepository rolRepository;
-    private final TotpService totpService;
     /*@GetMapping
     public ResponseEntity<List<UsuarioDTO>> findAll() {
         try {
@@ -92,24 +92,18 @@ public class UsuarioController {
 
     @GetMapping("/auth-code/{id}")
     public ResponseEntity<String> setup(@PathVariable UUID id) throws Exception{
-        Usuario user = usuarioService.findById(id).orElseThrow();
-        String rawSecret = totpService.generateSecretForUser(user);
-        String qrUrl = totpService.getQrUrl(rawSecret, user.getNombre(), "B2B-Project");
-        return ResponseEntity.ok(qrUrl);
+        return ResponseEntity.ok(usuarioService.setup2FA(id));
     }
 
     @PostMapping("/verify/{id}")
     public ResponseEntity<String> authVerify(@PathVariable UUID id, @RequestParam String code) throws Exception{
-            Usuario user = usuarioService.findById(id).orElseThrow();
-            boolean valid = totpService.verifyCode(user, code);
-
-            if (valid) {
-                usuarioService.saveComplete(user);
-                return ResponseEntity.ok("2FA activado correctamente");
-            }
-
+        try {
+            return ResponseEntity.ok(usuarioService.verifyAuth(id, code));
+        } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código inválido");
         }
+    }
 
     @GetMapping()
     public ResponseEntity<Page<UsuarioDTO>> logs(@RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -131,6 +125,16 @@ public class UsuarioController {
         } catch (Exception e) {
             log.error("Error al listar usuarios", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al listar usuarios");
+        }
+    }
+
+    @GetMapping("/user-info")
+    public ResponseEntity<UsuarioDTO> retrieveSessionInfo(@RequestParam String uId){
+        try{
+            log.info("EL DESCRIPTIVO" + String.valueOf(usuarioService.findByIdDTO(UUID.fromString(uId)).orElseThrow()));
+            return ResponseEntity.ok(usuarioService.findByIdDTO(UUID.fromString(uId)).orElseThrow());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

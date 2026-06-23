@@ -1,9 +1,14 @@
 package com.example.B2BProyect.service;
 
 import com.example.B2BProyect.repository.ContratoEmpresaTarifaRepository;
+import com.example.B2BProyect.repository.ContratoEmpresaDetalleRepository;
+import com.example.B2BProyect.repository.dto.request.ContratoCompletoRequest;
 import com.example.B2BProyect.repository.dto.request.ContratoEmpresaTarifaRequest;
+import com.example.B2BProyect.repository.dto.request.ContratoEmpresaDetalleRequest;
+import com.example.B2BProyect.repository.dto.request.DetalleSimpleRequest;
 import com.example.B2BProyect.repository.dto.response.ContratoEmpresaTarifasDTO;
 import com.example.B2BProyect.repository.entity.ContratoEmpresaTarifa;
+import com.example.B2BProyect.repository.entity.ContratoEmpresaDetalle;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +23,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ContratoEmpresaTarifaService {
     private final ContratoEmpresaTarifaRepository contratoEmpresaTarifaRepository;
+    private final ContratoEmpresaDetalleRepository contratoEmpresaDetalleRepository;
     private final EmpresaService empresaService;
     private final ProveedorService proveedorService;
     private final TarifaReglaService tarifaReglaService;
+    private final ProductoService productoService;
 
     @Transactional
     public ContratoEmpresaTarifasDTO save(ContratoEmpresaTarifaRequest request) {
@@ -34,7 +41,22 @@ public class ContratoEmpresaTarifaService {
             proveedorService.findById(request.getIdProveedor()).ifPresent(contrato::setIdProveedor);
         if (request.getIdRegla() != null)
             tarifaReglaService.findById(request.getIdRegla()).ifPresent(contrato::setIdRegla);
-        return new ContratoEmpresaTarifasDTO(contratoEmpresaTarifaRepository.save(contrato));
+            
+        ContratoEmpresaTarifa savedContrato = contratoEmpresaTarifaRepository.save(contrato);
+
+        if (request.getDetalles() != null) {
+            for (ContratoEmpresaDetalleRequest detReq : request.getDetalles()) {
+                ContratoEmpresaDetalle detalle = new ContratoEmpresaDetalle();
+                detalle.setPorcentajeDescuento(detReq.getPorcentajeDescuento());
+                detalle.setIdContrato(savedContrato);
+                if (detReq.getIdProducto() != null) {
+                    productoService.findById(detReq.getIdProducto()).ifPresent(detalle::setIdProducto);
+                }
+                contratoEmpresaDetalleRepository.save(detalle);
+            }
+        }
+
+        return new ContratoEmpresaTarifasDTO(savedContrato);
     }
 
     @Transactional(readOnly = true)
@@ -68,6 +90,41 @@ public class ContratoEmpresaTarifaService {
         if (!contratoEmpresaTarifaRepository.existsById(id)) return false;
         contratoEmpresaTarifaRepository.deleteById(id);
         return true;
+    }
+
+    public ContratoEmpresaTarifasDTO saveCompleto(ContratoCompletoRequest request) {
+        // 1. Guardar la Cabecera (ContratoEmpresaTarifa)
+        ContratoEmpresaTarifa contrato = new ContratoEmpresaTarifa();
+        contrato.setVigenteDesde(request.getVigenteDesde());
+        contrato.setVigenteHasta(request.getVigenteHasta());
+        contrato.setActivo(request.getActivo() != null ? request.getActivo() : true);
+
+        if (request.getIdEmpresa() != null)
+            empresaService.findById(request.getIdEmpresa()).ifPresent(contrato::setIdEmpresa);
+        if (request.getIdProveedor() != null)
+            proveedorService.findById(request.getIdProveedor()).ifPresent(contrato::setIdProveedor);
+        if (request.getIdRegla() != null)
+            tarifaReglaService.findById(request.getIdRegla()).ifPresent(contrato::setIdRegla);
+
+        // Guardamos la cabecera primero para generar el UUID (id)
+        ContratoEmpresaTarifa contratoGuardado = contratoEmpresaTarifaRepository.save(contrato);
+
+        // 2. Iterar y Guardar los Detalles vinculándolos al Contrato recién guardado
+        if (request.getDetalles() != null) {
+            for (DetalleSimpleRequest detReq : request.getDetalles()) {
+                ContratoEmpresaDetalle detalle = new ContratoEmpresaDetalle();
+                detalle.setPorcentajeDescuento(detReq.getPorcentajeDescuento());
+                detalle.setIdContrato(contratoGuardado); // Vinculamos la FK obligatoria
+
+                if (detReq.getIdProducto() != null) {
+                    productoService.findById(detReq.getIdProducto()).ifPresent(detalle::setIdProducto);
+                }
+
+                contratoEmpresaDetalleRepository.save(detalle);
+            }
+        }
+
+        return new ContratoEmpresaTarifasDTO(contratoGuardado);
     }
 
     @Transactional(readOnly = true)

@@ -7,6 +7,7 @@ import com.example.B2BProyect.service.AlmacenService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,16 @@ public class AlmacenController {
         } catch (Exception e) {
             log.error("Error listando almacén", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al listar almacenes");
+        }
+    }
+
+    @GetMapping("/mostrar")
+    public ResponseEntity<List<AlmacenDTO>> findAllByEmpresa(@RequestParam String idEmpresa){
+        try {
+            return ResponseEntity.ok(almacenService.findByIdEmpresa(UUID.fromString(idEmpresa)));
+        } catch (Exception e){
+            throw e;
+//            return ResponseEntity.badRequest().build();
         }
     }
 

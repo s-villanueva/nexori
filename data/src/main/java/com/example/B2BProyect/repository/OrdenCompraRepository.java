@@ -1,6 +1,7 @@
 package com.example.B2BProyect.repository;
 
 import com.example.B2BProyect.repository.dto.response.OrdenCompraDTO;
+import com.example.B2BProyect.repository.dto.response.OrdenEmpresaStats;
 import com.example.B2BProyect.repository.entity.OrdenCompra;
 import com.example.B2BProyect.repository.proyecciones.OrdenCompraProjection;
 import org.springframework.data.domain.Page;
@@ -60,4 +61,30 @@ public interface OrdenCompraRepository extends JpaRepository<OrdenCompra, UUID> 
             @Param("pInit") LocalDateTime pInit,
             @Param("pEnd") LocalDateTime pEnd,
             Pageable pageable);
+
+    @Query("""
+SELECT new com.example.B2BProyect.repository.dto.response.OrdenEmpresaStats(
+    COUNT(oc),
+    SUM(CASE WHEN oc.idEstado = 'PENDIENTE' THEN 1 ELSE 0 END),
+    CAST(COALESCE(SUM(
+        CASE 
+            WHEN EXTRACT(MONTH FROM oc.fecha) = EXTRACT(MONTH FROM CURRENT_DATE)
+             AND EXTRACT(YEAR FROM oc.fechaOrden) = EXTRACT(YEAR FROM CURRENT_DATE)
+            THEN oc.total
+            ELSE 0.0
+        END
+    ), 0.0) AS bigdecimal)
+)
+FROM OrdenCompra oc
+WHERE oc.idEmpresaCompradora.id=:pId
+""")
+    OrdenEmpresaStats obtenerStats(UUID pId);
+
+    @Query("SELECT new com.example.B2BProyect.repository.dto.response.OrdenCompraDTO( o.id, o.total, o.fecha, o.fechaOrden, o.idEstado, o.idProveedor.idEmpresa.nombre, o.idEmpresaCompradora.nombre, o.idSucursal.nombre, o.idUsuario.nombre)" +
+            " FROM OrdenCompra o WHERE o.idEmpresaCompradora.id=:pIdEmpresa")
+    Page<OrdenCompraDTO> retrieveAllFromEmpresaCompradora(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
+
+    @Query("SELECT new com.example.B2BProyect.repository.dto.response.OrdenCompraDTO( o.id, o.total, o.fecha, o.fechaOrden, o.idEstado, o.idProveedor.idEmpresa.nombre, o.idEmpresaCompradora.nombre, o.idSucursal.nombre, o.idUsuario.nombre)" +
+            " FROM OrdenCompra o WHERE o.idProveedor.idEmpresa.id=:pIdEmpresa")
+    Page<OrdenCompraDTO> retrieveAllFromEmpresaProveedora(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
 }

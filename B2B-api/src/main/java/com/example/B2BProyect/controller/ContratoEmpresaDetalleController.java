@@ -1,5 +1,6 @@
 package com.example.B2BProyect.controller;
 
+import com.example.B2BProyect.repository.dto.response.ContratoEmpresaStats;
 import com.example.B2BProyect.service.exception.OperationException;
 import com.example.B2BProyect.repository.dto.request.ContratoEmpresaDetalleRequest;
 import com.example.B2BProyect.repository.dto.response.ContratoEmpresaDetalleDTO;
@@ -7,6 +8,7 @@ import com.example.B2BProyect.service.ContratoEmpresaDetalleService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,16 +25,34 @@ import java.util.UUID;
 public class ContratoEmpresaDetalleController {
     private final ContratoEmpresaDetalleService contratoEmpresaDetalleService;
 
+//    @GetMapping
+//    public ResponseEntity<List<ContratoEmpresaDetalleDTO>> findAll() {
+//        try {
+//            return ResponseEntity.ok(contratoEmpresaDetalleService.findAll());
+//        } catch (OperationException e) {
+//            log.error("OperationException: {}", e.getMessage());
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+//        } catch (Exception e) {
+//            log.error("Error listando contrato detalle: {}", e.getMessage());
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico");
+//        }
+//    }
+
     @GetMapping
-    public ResponseEntity<List<ContratoEmpresaDetalleDTO>> findAll() {
-        try {
-            return ResponseEntity.ok(contratoEmpresaDetalleService.findAll());
-        } catch (OperationException e) {
-            log.error("OperationException: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            log.error("Error listando contrato detalle: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico");
+    public ResponseEntity<Page<ContratoEmpresaDetalleDTO>> findAll(@RequestParam String idEmpresa, @RequestParam Integer page, @RequestParam Integer size){
+        try{
+            return ResponseEntity.ok(contratoEmpresaDetalleService.findAllByEmpresa(UUID.fromString(idEmpresa), page, size));
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/stats")
+    private ResponseEntity<ContratoEmpresaStats> retrieveStats(@RequestParam String idEmpresa){
+        try{
+            return ResponseEntity.ok(contratoEmpresaDetalleService.retrieveStatsFromEmpresa(UUID.fromString(idEmpresa)));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
     }
 

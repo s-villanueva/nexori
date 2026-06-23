@@ -95,7 +95,7 @@ public class AuthController {
         }
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.passwordHash()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.password()));
             log.info("Autenticado correctamente");
             SecurityContextHolder.getContext().
                     setAuthentication(new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities()));

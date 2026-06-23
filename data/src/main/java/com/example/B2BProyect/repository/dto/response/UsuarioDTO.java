@@ -4,12 +4,14 @@ import com.example.B2BProyect.repository.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
 public class UsuarioDTO {
     private UUID id;
     private String nombre;
@@ -39,6 +41,19 @@ public class UsuarioDTO {
         this.nombreEmpresa = nombreEmpresa;
         this.nombreSucursal = nombreSucursal;
         this.nombreRol = nombreRol;
+    }
+
+    public UsuarioDTO(UUID id, String nombre, String email, Boolean activo,
+                      String nombreEmpresa, String nombreSucursal, String nombreRol, Empresa empresaDTO, SucursalEmpresa sucursalEmpresaDTO) {
+        this.id = id;
+        this.nombre = nombre;
+        this.email = email;
+        this.activo = activo;
+        this.nombreEmpresa = nombreEmpresa;
+        this.nombreSucursal = nombreSucursal;
+        this.nombreRol = nombreRol;
+        this.idEmpresa = new EmpresaDTO(empresaDTO);
+        this.idSucursal = new SucursalEmpresaDTO(sucursalEmpresaDTO);
     }
 
     public UsuarioDTO(UUID id, String nombre, String email, Boolean activo,

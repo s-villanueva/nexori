@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -17,4 +18,5 @@ public class ContratoEmpresaTarifaRequest {
     private UUID idEmpresa;
     private UUID idProveedor;
     private UUID idRegla;
+    private List<ContratoEmpresaDetalleRequest> detalles;
 }

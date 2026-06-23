@@ -38,12 +38,17 @@ public class ProductoAlmacenService {
 
     @Transactional(readOnly = true)
     public List<ProductoAlmacenDTO> findAll() {
-        return productoAlmacenRepository.findAll().stream().map(ProductoAlmacenDTO::new).toList();
+        return productoAlmacenRepository.findAllDTO();
     }
 
     @Transactional(readOnly = true)
     public List<ProductoAlmacenDTO> findByAlmacen(UUID idAlmacen) {
         return productoAlmacenRepository.findByAlmacenDTO(idAlmacen);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductoAlmacenDTO> findBySku(String sku){
+        return productoAlmacenRepository.findAllByProductoSku(sku);
     }
 
     @Transactional(readOnly = true)

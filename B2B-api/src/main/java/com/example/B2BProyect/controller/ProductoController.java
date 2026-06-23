@@ -4,6 +4,7 @@ import com.example.B2BProyect.service.exception.OperationException;
 import com.example.B2BProyect.repository.dto.request.ProductoRequest;
 import com.example.B2BProyect.repository.dto.response.ProductoDTO;
 import com.example.B2BProyect.service.ProductoService;
+import org.springframework.web.multipart.MultipartFile;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,29 @@ public class ProductoController {
             @RequestParam(defaultValue = "10") int size) {
         try {
             return ResponseEntity.ok(productoService.findAllPaged(page, size));
+        } catch (Exception e) {
+            log.error("Error al listar productos paginados: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping(value = "/bulk-upload", consumes = "multipart/form-data")
+    public ResponseEntity<Integer> uploadBulkProducts(@RequestParam("file") MultipartFile file, @RequestParam String idEmpresa){
+        try {
+            return ResponseEntity.ok(productoService.manageCsvFile(file, UUID.fromString(idEmpresa)));
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<ProductoDTO>> findAllofProviderPaged(
+            @RequestParam String idEmpresa,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            return ResponseEntity.ok(productoService.findAllOfProvider(UUID.fromString(idEmpresa),page, size));
         } catch (Exception e) {
             log.error("Error al listar productos paginados: {}", e.getMessage());
             return ResponseEntity.badRequest().build();

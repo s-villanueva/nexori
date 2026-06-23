@@ -6,6 +6,7 @@ import com.example.B2BProyect.repository.entity.Proveedor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -16,11 +17,20 @@ public class ProductoDTO {
     private String nombre;
     private String descripcion;
     private String unidadMedida;
-    private boolean activo;
+    private Boolean activo;
+    private BigDecimal precioBase;
     private String nombreCategoria;
     private String nombreProveedor;
     private CategoriaDTO idCategoria;
     private ProveedorDTO idProveedor;
+
+    public ProductoDTO(String sku, String nombre, String descripcion, String unidadMedida, BigDecimal precioBase) {
+        this.sku = sku;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.unidadMedida = unidadMedida;
+        this.precioBase = precioBase;
+    }
 
     public ProductoDTO(Producto producto) {
         this.id = producto.getId();

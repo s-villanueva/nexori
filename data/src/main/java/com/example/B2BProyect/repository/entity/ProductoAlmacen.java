@@ -3,8 +3,7 @@ package com.example.B2BProyect.repository.entity;
 import com.example.B2BProyect.repository.entity.Almacen;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
@@ -44,5 +43,4 @@ public class ProductoAlmacen {
     @ColumnDefault("true")
     @Column(name = "activo", nullable = false)
     private Boolean activo = false;
-
 }

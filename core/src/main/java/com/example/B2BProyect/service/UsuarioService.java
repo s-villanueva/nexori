@@ -1,5 +1,6 @@
 package com.example.B2BProyect.service;
 
+import com.example.B2BProyect.integracion.totp.TotpService;
 import com.example.B2BProyect.repository.EmpresaRepository;
 import com.example.B2BProyect.repository.RolUsuarioRepository;
 import com.example.B2BProyect.repository.SucursalEmpresaRepository;
@@ -10,12 +11,15 @@ import com.example.B2BProyect.repository.dto.response.SucursalEmpresaDTO;
 import com.example.B2BProyect.repository.dto.response.UsuarioDTO;
 import com.example.B2BProyect.repository.entity.Log;
 import com.example.B2BProyect.repository.entity.Usuario;
+import dev.samstevens.totp.exceptions.QrGenerationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
+import org.hibernate.annotations.Cache;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +35,8 @@ import java.util.UUID;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TotpService totpService;
 
-    @CacheEvict(cacheNames = "usuarios", allEntries = true)
     @Transactional
     public void save(UsuarioRequest dto,
                      EmpresaRepository empresaRepository,
@@ -58,7 +62,6 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    @Cacheable(cacheNames = "usuarios")
     @Transactional(readOnly = true)
     public List<UsuarioDTO> findAll() {
         return usuarioRepository.findAll().stream()
@@ -73,11 +76,19 @@ public class UsuarioService {
                 .toList();
     }
 
+    @Cacheable(value = "usuarios", key = "#id")
     @Transactional(readOnly = true)
     public Optional<Usuario> findById(UUID id) {
         return usuarioRepository.findById(id);
     }
 
+//    @Cacheable(value = "usuarios", key = "#id")
+    @Transactional(readOnly = true)
+    public Optional<UsuarioDTO> findByIdDTO(UUID id) {
+        return usuarioRepository.findByIdDTO(id);
+    }
+
+    @Cacheable(value = "usuarios", key = "#id")
     @Transactional(readOnly = true)
     public Optional<Usuario> findByEmail(String email) {
         return usuarioRepository.findByEmail(email);
@@ -88,7 +99,6 @@ public class UsuarioService {
         return this.usuarioRepository.findByUserEmailToValidateSession(email);
     }
 
-    @CacheEvict(cacheNames = "usuarios", allEntries = true)
     @Transactional
     public Optional<UsuarioDTO> update(UUID id, UsuarioRequest dto,
                                        EmpresaRepository empresaRepository,
@@ -113,5 +123,22 @@ public class UsuarioService {
         if (pInit == null || pEnd == null)
             return usuarioRepository.findAllPaged(pageable);
         return usuarioRepository.findAllByOrderByDateDesc(pInit, pEnd, pageable);
+    }
+
+    public String setup2FA(UUID id) throws QrGenerationException {
+        Usuario user = usuarioRepository.findById(id).orElseThrow();
+        String rawSecret = totpService.generateSecretForUser(user);
+        return totpService.getQrUrl(rawSecret, user.getNombre(), "Nexori");
+    }
+
+    public String verifyAuth(UUID id, String code) {
+        Usuario user = usuarioRepository.findById(id).orElseThrow();
+        boolean valid = totpService.verifyCode(user, code);
+        if (valid) {
+            usuarioRepository.save(user);
+            return "2FA activado correctamente";
+        } else{
+            throw new RuntimeException("HA OCURRIDO UN PROBLEMA");
+        }
     }
 }
