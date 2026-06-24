@@ -57,8 +57,8 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             echo "=== Contenedor corriendo ==="
-            docker compose ps backend
+            docker compose ps b2b-spring
             echo "=== JAR en el servidor ==="
             ls -lh *.jar
             echo "=== Últimos logs del backend ==="
-            docker compose logs --tail=20 backend
+            docker compose logs --tail=20 b2b-spring
