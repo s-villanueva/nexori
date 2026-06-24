@@ -42,7 +42,7 @@ public class ProductoService {
     private final ProveedorService proveedorService;
     private final EmpresaService empresaService;
 
-    @CacheEvict(cacheNames = "productos", allEntries = true)
+//    @CacheEvict(cacheNames = "productos", allEntries = true)
     @Transactional
     public void save(ProductoRequest request) {
         Producto pr = fromReqToProduct(request);
@@ -125,7 +125,7 @@ public class ProductoService {
         }
     }
 
-    @Cacheable(cacheNames = "productos")
+//    @Cacheable(cacheNames = "productos")
     @Transactional(readOnly = true)
     public List<ProductoDTO> findAll() {
         return productoRepository.findAll().stream().map(ProductoDTO::new).toList();

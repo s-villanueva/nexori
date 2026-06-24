@@ -53,5 +53,7 @@ public interface FacturaRepository extends JpaRepository<Factura, UUID> {
     @Query("select new com.example.B2BProyect.repository.dto.response.FacturaDTO(" +
             "f.id, f.fecha, f.total, f.idEstado, f.idOrden) from Factura f WHERE f.idOrden.idEmpresaCompradora.id=:pIdEmpresa")
     Page<FacturaDTO> findAllForEmpresa(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
+
+    Factura findByIdOrdenId(UUID idOrdenId);
 }
 

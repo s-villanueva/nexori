@@ -1,6 +1,7 @@
 package com.example.B2BProyect.service;
 
 import com.example.B2BProyect.repository.ContratoEmpresaDetalleRepository;
+import com.example.B2BProyect.repository.ProveedorRepository;
 import com.example.B2BProyect.repository.dto.request.ContratoEmpresaDetalleRequest;
 import com.example.B2BProyect.repository.dto.response.ContratoEmpresaDetalleDTO;
 import com.example.B2BProyect.repository.dto.response.ContratoEmpresaStats;
@@ -21,6 +22,7 @@ public class ContratoEmpresaDetalleService {
     private final ContratoEmpresaDetalleRepository contratoEmpresaDetalleRepository;
     private final ProductoService productoService;
     private final ContratoEmpresaTarifaService contratoEmpresaTarifaService;
+    private final ProveedorRepository proveedorRepository;
 
     @Transactional
     public void save(ContratoEmpresaDetalleRequest request) {
@@ -40,8 +42,12 @@ public class ContratoEmpresaDetalleService {
 
     @Transactional(readOnly = true)
     public Page<ContratoEmpresaDetalleDTO> findAllByEmpresa(UUID idEmpresa, Integer page, Integer size){
-        Page<ContratoEmpresaDetalleDTO> empresaDetalleDTOS =contratoEmpresaDetalleRepository.findAllByIdContratoIdEmpresaId(idEmpresa, PageRequest.of(page,size));
-//        empresaDetalleDTOS.forEach(dto -> System.out.println(dto));
+        Page<ContratoEmpresaDetalleDTO> empresaDetalleDTOS;
+        if(proveedorRepository.existsProveedorByIdEmpresaId((idEmpresa))) {
+            empresaDetalleDTOS = contratoEmpresaDetalleRepository.findAllByIdContratoIdEmpresaIdProveedor(idEmpresa, PageRequest.of(page, size));
+        } else {
+            empresaDetalleDTOS = contratoEmpresaDetalleRepository.findAllByIdContratoIdEmpresaIdEmpresa(idEmpresa, PageRequest.of(page, size));
+        }
         return empresaDetalleDTOS;
     }
 

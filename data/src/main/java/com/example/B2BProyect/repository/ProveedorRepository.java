@@ -36,4 +36,6 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, UUID> {
     Page<ProveedorDTO> findAllByEmpresa(Pageable pageable);
 
     Optional<Proveedor> findByIdEmpresaId(UUID idEmpresaId);
+
+    boolean existsProveedorByIdEmpresaId(UUID idEmpresaId);
 }

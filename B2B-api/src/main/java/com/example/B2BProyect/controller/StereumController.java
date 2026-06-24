@@ -3,6 +3,8 @@ package com.example.B2BProyect.controller;
 import com.example.B2BProyect.integracion.*;
 import com.example.B2BProyect.integracion.stereum.PaymentRequest;
 import com.example.B2BProyect.integracion.stereum.StereumPayResponse;
+import com.example.B2BProyect.repository.FacturaRepository;
+import com.example.B2BProyect.repository.entity.Factura;
 import com.example.B2BProyect.repository.entity.OrdenCompra;
 import com.example.B2BProyect.service.OrdenCompraService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -19,6 +21,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,23 +42,26 @@ public class StereumController {
 
     private final SistemaB2B sistemaB2B;
     private final OrdenCompraService ordenCompraService;
+    @Autowired
+    private FacturaRepository facturaRepository;
 
     @PostMapping("/charge")
     public ResponseEntity<?> charge(@RequestBody PaymentRequest request) {
-        log.info("REQUEST NAME: " + request.getOrderId());
-        OrdenCompra ordenCompra = ordenCompraService.findById(request.getOrderId()).get();
+//        log.info("REQUEST NAME: " + request.getOrderId());
+        Factura ordenCompra = facturaRepository.findById(request.getOrderId()).get();
+        OrdenCompra oc = ordenCompra.getIdOrden();
         try {
             JSONObject customer = new JSONObject();
-            customer.put("name", ordenCompra.getIdUsuario().getNombre());
-            customer.put("lastname", "Laredo");
+            customer.put("name", ordenCompra.getIdOrden().getIdUsuario().getNombre().split(" ")[0]);
+            customer.put("lastname", oc.getIdUsuario().getNombre().split(" ")[1]);
             customer.put("document_number", "76887344");
 
             JSONObject req = new JSONObject();
             req.put("country", "BO");
-            req.put("amount", "100");
-            req.put("currency", "USDT");
-            req.put("network", "POLYGON");
-            req.put("charge_reason", "COMPRA A: " + ordenCompra.getIdProveedor().getIdEmpresa().getNombre());
+            req.put("amount", ordenCompra.getTotal());
+            req.put("currency", "BOB");
+            req.put("network", "CSL");
+            req.put("charge_reason", "COMPRA A: " + oc.getIdProveedor().getIdEmpresa().getNombre());
             req.put("idempotency_key", ordenCompra.getId().toString());
             req.put("reservation_validity_time", "10");
             req.put("customer", customer);
@@ -61,7 +69,7 @@ public class StereumController {
 
 //            Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //            clientes.put(request.getOrderId(), user.getNombre());
-            log.info(clientes.toString());
+            log.info(req.toString());
             return ok(sistemaB2B.callStereum(req));
         } catch (Exception e) {
             log.error("Error generando QR Stereum: {}", e.getMessage());
@@ -72,36 +80,43 @@ public class StereumController {
 
     @Autowired
     private SimpMessagingTemplate template;
+//    @PostMapping(value = "/outbound", produces = MediaType.APPLICATION_JSON_VALUE, consumes = {MediaType.APPLICATION_JSON_VALUE})
+//    public ResponseEntity<Void> outbound(
+//            @RequestHeader("X-Signature") String signature,
+//            @RequestHeader("X-Timestamp") int tiempo,
+//            @RequestBody String body) throws Exception {
+//
+//        final ObjectMapper mapper = new ObjectMapper();
+//
+//        String hmac = new HmacUtils("HmacSHA256",
+//                secretKey.getBytes(StandardCharsets.UTF_8))
+//                .hmacHex(body.getBytes(StandardCharsets.UTF_8));
+//
+//        if (!signature.equals(hmac)) {
+//            log.info("X-Signature recibido: {}", signature);
+//            throw new Exception("MessageCode.SIGN_REQUEST_INVALID");
+//        }
+//
+//        if (System.currentTimeMillis() / 1000 - tiempo >= 3000)
+//            throw new Exception("MessageCode.TIEMPO_INVALIDO");
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        StereumPayResponse response = objectMapper.readValue(body, StereumPayResponse.class);
+//        Factura factura = facturaRepository.findByIdOrdenId(response.getTransaction().getIdempotencyKey());
+//        factura.setIdEstado("pagada");
+//        factura.setModifiedDate( LocalDateTime.ofInstant( Instant.ofEpochMilli(response.getTimestamp()), ZoneId.systemDefault()));
+//        facturaRepository.save(factura);
+////        template.convertAndSend("/paymenting/" + response.getTransaction().getIdempotencyKey(), response.getTransaction().getStatus());
+//        return ok().build();
+//    }
     @PostMapping(value = "/outbound", produces = MediaType.APPLICATION_JSON_VALUE, consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> outbound(
             @RequestHeader("X-Signature") String signature,
             @RequestHeader("X-Timestamp") int tiempo,
             @RequestBody String body) throws Exception {
 
-        final ObjectMapper mapper = new ObjectMapper();
-
-        String hmac = new HmacUtils("HmacSHA256",
-                secretKey.getBytes(StandardCharsets.UTF_8))
-                .hmacHex(body.getBytes(StandardCharsets.UTF_8));
-
-        if (!signature.equals(hmac)) {
-//            log.info("Body recibido: {}", body);
-//            log.info("HMAC calculado: {}", hmac);
-            log.info("X-Signature recibido: {}", signature);
-            throw new Exception("MessageCode.SIGN_REQUEST_INVALID");
-        }
-
-
-
-//        if (System.currentTimeMillis() / 1000 - tiempo >= 3000)
-//            throw new Exception("MessageCode.TIEMPO_INVALIDO");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        StereumPayResponse response = objectMapper.readValue(body, StereumPayResponse.class);
-
-        template.convertAndSend("/paymenting/" + response.getTransaction().getIdempotencyKey(), response.getTransaction().getStatus());
-        return ok().build();
+        return ResponseEntity.ok().build();
     }
 
 }

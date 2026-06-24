@@ -46,5 +46,11 @@ public interface ContratoEmpresaDetalleRepository extends JpaRepository<Contrato
             "com.example.B2BProyect.repository.dto.response.ContratoEmpresaDetalleDTO(" +
             "cd.id, cd.porcentajeDescuento, cd.idProducto.nombre, cd.idContrato.idRegla.nombre, cd.idContrato.vigenteDesde, cd.idContrato.vigenteHasta)" +
             " FROM ContratoEmpresaDetalle cd WHERE cd.idContrato.idProveedor.idEmpresa.id=:pIdEmpresa")
-    Page<ContratoEmpresaDetalleDTO> findAllByIdContratoIdEmpresaId(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
+    Page<ContratoEmpresaDetalleDTO> findAllByIdContratoIdEmpresaIdProveedor(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
+
+    @Query("SELECT new " +
+            "com.example.B2BProyect.repository.dto.response.ContratoEmpresaDetalleDTO(" +
+            "cd.id, cd.porcentajeDescuento, cd.idProducto.nombre, cd.idContrato.idRegla.nombre, cd.idContrato.vigenteDesde, cd.idContrato.vigenteHasta)" +
+            " FROM ContratoEmpresaDetalle cd WHERE cd.idContrato.idEmpresa.id=:pIdEmpresa")
+    Page<ContratoEmpresaDetalleDTO> findAllByIdContratoIdEmpresaIdEmpresa(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
 }
