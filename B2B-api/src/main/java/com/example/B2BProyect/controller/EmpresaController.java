@@ -28,8 +28,8 @@ public class EmpresaController {
 
     @GetMapping
     public ResponseEntity<Page<EmpresaDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size, @RequestParam(value = "sortBy", defaultValue = "nombre") String sortBy) {
-        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info(user.getIdRol().getNombre());
+//        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        log.info(user.getIdRol().getNombre());
         try {
             return ResponseEntity.ok(empresaService.findAll(page,size,sortBy));
         } catch (OperationException e) {

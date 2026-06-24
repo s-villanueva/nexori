@@ -1,6 +1,7 @@
 package com.example.B2BProyect.controller;
 
 import com.example.B2BProyect.integracion.totp.TotpService;
+import com.example.B2BProyect.repository.dto.request.RegisterRequest;
 import com.example.B2BProyect.repository.entity.Usuario;
 import com.example.B2BProyect.service.exception.OperationException;
 import com.example.B2BProyect.repository.EmpresaRepository;
@@ -51,18 +52,32 @@ public class UsuarioController {
         }
     }*/
 
-    @GetMapping("/password-recovery")
-    public ResponseEntity<String> testPasswordRecovery() {
-        Random r = new Random();
-        int ra = r.nextInt(100000, 999999);
-        emailService.sendPassword("nicolascresposuarez@gmail.com", String.valueOf(ra));
-        return ResponseEntity.ok("Email sent");
-    }
+//    @GetMapping("/password-recovery")
+//    public ResponseEntity<String> testPasswordRecovery() {
+//        Random r = new Random();
+//        int ra = r.nextInt(100000, 999999);
+//        emailService.sendPassword("nicolascresposuarez@gmail.com", String.valueOf(ra));
+//        return ResponseEntity.ok("Email sent");
+//    }
 
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody UsuarioRequest dto) {
         try {
             usuarioService.save(dto, empresaRepository, sucursalRepository, rolRepository);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (OperationException e) {
+            log.error("Error creando nuevo usuario: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("Error creando nuevo usuario", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al guardar usuario");
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@RequestBody RegisterRequest dto) {
+        try {
+            usuarioService.registerNew(dto);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (OperationException e) {
             log.error("Error creando nuevo usuario: {}", e.getMessage());

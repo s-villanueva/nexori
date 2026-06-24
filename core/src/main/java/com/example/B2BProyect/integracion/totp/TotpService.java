@@ -38,6 +38,8 @@ public class TotpService {
 
     public boolean verifyCode(Usuario user, String code) {
         String rawSecret = encryptionService.decrypt(user.getTotpSecret());
+        log.error("CODIGO: " + code);
+        log.error("SECRET: " + rawSecret);
         return codeVerifier.isValidCode(rawSecret, code); // ← String, no int
     }
 

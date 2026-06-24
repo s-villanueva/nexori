@@ -78,7 +78,6 @@ public class AuthController {
         return ResponseEntity.ok("Contraseña actualizada correctamente");
     }
 
-
     public OKAuthDto auth(AuthenticationDTO data)  {
         String email = data.email();
         log.info("Getting user email: {}", email);
@@ -120,8 +119,9 @@ public class AuthController {
         Usuario user;
         try {
             Optional<Usuario> userOptional = userService.findByEmailToValidateSession(email);
+//            log.error("usuario " + userOptional.get().getNombre());
             if (userOptional.isEmpty()) {
-                throw new BadCredentialsException("Email o contraseña son incorrectos");
+                throw new BadCredentialsException("Email o codigo son incorrectos");
             }
             user = userOptional.get();
         } catch (Exception e) {
@@ -131,8 +131,9 @@ public class AuthController {
 
         try {
 //            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.passwordHash()));
-            if (!totpService.verifyCode(user, code))
+            if (!totpService.verifyCode(user, code)) {
                 throw new BadCredentialsException("Codigo invalido");
+            }
             log.info("Autenticado correctamente");
             SecurityContextHolder.getContext().
                     setAuthentication(new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities()));

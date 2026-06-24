@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <title>UPB - Confirmación de Compra</title>
+    <title>Nexori - Confirmación de Compra</title>
     <style>
         /* -------------------------------------
             GLOBAL RESETS
@@ -17,11 +17,11 @@
         }
 
         body {
-            background-color: #f6f6f6;
-            font-family: sans-serif;
+            background-color: #EAEFEF;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
             margin: 0;
             padding: 0;
             -ms-text-size-adjust: 100%;
@@ -42,7 +42,7 @@
         }
 
         table td {
-            font-family: sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-size: 14px;
             vertical-align: top;
         }
@@ -52,7 +52,7 @@
         ------------------------------------- */
 
         .body {
-            background: linear-gradient(180deg, #002855 0%, #004A99 100%);
+            background-color: #EAEFEF;
             width: 100%;
         }
 
@@ -60,12 +60,12 @@
             display: block;
             margin: 0 auto !important;
             max-width: 580px;
-            padding: 10px;
+            padding: 20px 10px;
             width: 580px;
         }
 
         p {
-            color: #1c1c1c !important;
+            color: #3B534E !important;
         }
 
         .content {
@@ -73,7 +73,6 @@
             display: block;
             margin: 0 auto;
             max-width: 580px;
-            padding: 10px;
         }
 
         /* -------------------------------------
@@ -81,24 +80,25 @@
         ------------------------------------- */
         .main {
             background: #ffffff;
-            border-radius: 8px;
+            border-radius: 24px;
+            border: 1px solid #CBD6D4;
             width: 100%;
         }
 
         .wrapper {
             box-sizing: border-box;
-            padding: 20px;
+            padding: 30px;
         }
 
         .footer {
             clear: both;
-            margin-top: 10px;
+            margin-top: 20px;
             text-align: center;
             width: 100%;
         }
 
         .footer td, .footer p, .footer span, .footer a {
-            color: #999999;
+            color: #7A938F;
             font-size: 12px;
             text-align: center;
         }
@@ -107,32 +107,32 @@
             TYPOGRAPHY
         ------------------------------------- */
         h1, h2, h3, h4 {
-            color: #002855;
-            font-family: sans-serif;
+            color: #122A25;
+            font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            line-height: 1.4;
+            line-height: 1.3;
             margin: 0;
             margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             text-align: center;
+            letter-spacing: -0.02em;
         }
 
         p, ul, div, a, ol {
-            font-family: sans-serif;
             font-size: 14px;
             font-weight: normal;
             margin: 0;
             margin-bottom: 15px;
         }
 
-        /* Ajuste de alineación para la factura (izquierda/justificado en textos) */
         .text-info {
             list-style-position: inside;
-            margin-left: 5px;
+            margin-left: 0;
             text-align: left;
+            color: #3B534E;
         }
 
         /* -------------------------------------
@@ -140,41 +140,46 @@
         ------------------------------------- */
         .invoice-table {
             width: 100%;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 25px;
+            margin-bottom: 25px;
             border-spacing: 0;
         }
         .invoice-table th {
-            background-color: #f6f6f6;
-            color: #002855;
-            font-weight: bold;
+            background-color: #EAEFEF;
+            color: #0F6E56;
+            font-weight: 700;
             text-align: left;
-            padding: 10px;
-            font-size: 13px;
-            border-bottom: 2px solid #e0e0e0;
+            padding: 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #CBD6D4;
         }
         .invoice-table td {
-            padding: 10px;
-            border-bottom: 1px solid #f6f6f6;
+            padding: 12px;
+            border-bottom: 1px solid #CBD6D4;
             font-size: 13px;
-            color: #333333;
+            color: #122A25;
         }
         .text-right {
             text-align: right;
         }
         .total-row td {
             font-weight: bold;
-            color: #002855;
+            color: #0F6E56;
             font-size: 15px;
-            border-top: 2px solid #002855;
+            border-top: 2px solid #0F6E56;
             border-bottom: none;
         }
         .metadata-box {
-            background-color: #f9f9f9;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-left: 4px solid #F3A900;
+            background-color: #EAEFEF;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 25px;
+            border-left: 4px solid #BA7517;
+            border-top: 1px solid #CBD6D4;
+            border-right: 1px solid #CBD6D4;
+            border-bottom: 1px solid #CBD6D4;
         }
 
         /* -------------------------------------
@@ -183,29 +188,32 @@
         .btn {
             box-sizing: border-box;
             width: 100%;
+            margin-top: 15px;
         }
         .btn table {
             width: auto;
             margin: 0 auto;
         }
         .btn table td {
-            background-color: #ffffff;
-            border-radius: 5px;
+            border-radius: 12px;
             text-align: center;
         }
         .btn a {
-            background-color: #F3A900;
-            border: solid 1px #F3A900;
-            border-radius: 5px;
+            background-color: #BA7517;
+            border: solid 1px #BA7517;
+            border-radius: 12px;
             box-sizing: border-box;
             color: #ffffff;
             cursor: pointer;
             display: inline-block;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin: 0;
-            padding: 12px 25px;
+            padding: 14px 28px;
             text-decoration: none;
+            transition: all 0.2s ease;
         }
 
         /* -------------------------------------
@@ -220,25 +228,26 @@
             table[class=body] td,
             table[class=body] span,
             table[class=body] a {
-                font-size: 15px !important;
+                font-size: 14px !important;
             }
             table[class=body] .wrapper {
-                padding: 15px !important;
+                padding: 20px !important;
             }
             table[class=body] .container {
                 width: 100% !important;
+                padding: 10px !important;
             }
         }
 
         @media all {
-            .btn-primary table td:hover { background-color: #D69400 !important; }
-            .btn-primary a:hover { background-color: #D69400 !important; border-color: #D69400 !important; }
+            .btn-primary table td:hover { background-color: #A36310 !important; }
+            .btn-primary a:hover { background-color: #A36310 !important; border-color: #A36310 !important; }
         }
     </style>
 </head>
 <body>
 
-<span class="preheader">Tu comprobante de pago de la UPB.</span>
+<span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">Tu comprobante de pago de Nexori.</span>
 <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
     <tr>
         <td>&nbsp;</td>
@@ -251,27 +260,26 @@
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td style="overflow: hidden">
-                                        <div>
-                                            <img th:src="|cid:${imageResourceName}|" alt="Logo UPB"
-                                                 style="max-width: 120px; margin-top: 3%; height: auto; margin-left: 0; margin-right: auto;"/>
+                                        <div style="text-align: left; border-bottom: 1px solid #CBD6D4; padding-bottom: 15px; margin-bottom: 20px;">
+                                            <img th:src="|cid:${imageResourceName}|" alt="Logo Nexori"
+                                                 style="max-height: 40px; width: auto; display: block;"/>
                                         </div>
-                                        <br>
 
-                                        <h1>¡Gracias por tu pago!</h1>
-                                        <p class="text-info">Hola <b th:text="${customerName}">Juan Pérez</b>,</p>
-                                        <p class="text-info">Confirmamos que tu transacción se ha procesado con éxito. A continuación, encontrarás los detalles de tu compra y facturación:</p>
+                                        <h1>¡Gracias por su pago!</h1>
+                                        <p class="text-info">Estimado(a) <b th:text="${customerName}">Juan Pérez</b>,</p>
+                                        <p class="text-info">Le confirmamos que su transacción en la plataforma B2B se ha procesado con éxito. A continuación, encontrará el resumen detallado de su compra y los datos fiscales registrados:</p>
 
                                         <div class="metadata-box">
                                             <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                                 <tr>
-                                                    <td style="font-size: 13px; line-height: 1.6; color: #444444;">
-                                                        <strong>Nro. de Factura/Recibo:</strong> <span th:text="${invoiceNumber}">001-00012345</span><br/>
-                                                        <strong>Fecha:</strong> <span th:text="${invoiceDate}">18/06/2026</span><br/>
+                                                    <td style="font-size: 13px; line-height: 1.6; color: #122A25; padding-right: 10px;">
+                                                        <strong>Nro. de Factura:</strong> <span th:text="${invoiceNumber}">001-00012345</span><br/>
+                                                        <strong>Fecha de Emisión:</strong> <span th:text="${invoiceDate}">18/06/2026</span><br/>
                                                         <strong>Método de Pago:</strong> <span th:text="${paymentMethod}">Tarjeta de Crédito/Débito</span>
                                                     </td>
-                                                    <td style="font-size: 13px; line-height: 1.6; color: #444444;">
+                                                    <td style="font-size: 13px; line-height: 1.6; color: #122A25;">
                                                         <strong>Razón Social:</strong> <span th:text="${fiscalName}">Juan Pérez</span><br/>
-                                                        <strong>NIT/CI:</strong> <span th:text="${fiscalId}">12345678</span>
+                                                        <strong>NIT / CI:</strong> <span th:text="${fiscalId}">12345678</span>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -280,7 +288,7 @@
                                         <table class="invoice-table">
                                             <thead>
                                             <tr>
-                                                <th>Concepto</th>
+                                                <th>Concepto Comercial</th>
                                                 <th style="width: 15%; text-align: center;">Cant.</th>
                                                 <th style="width: 25%; text-align: right;">Subtotal</th>
                                             </tr>
@@ -319,38 +327,38 @@
                                         </table>
 
                                         <br/>
-                                        <p class="text-info" style="font-size: 12px; color: #666666 !important; text-align: center;">
-                                            Si tienes alguna duda con este cobro, por favor comunícate con el departamento de Facturación.
+                                        <p class="text-info" style="font-size: 11px; color: #7A938F !important; text-align: center;">
+                                            Si tiene alguna duda o consulta sobre esta facturación, por favor comuníquese con nuestro departamento de Soporte Comercial.
                                         </p>
                                         <br/>
 
-                                        <div style="background-color: #e0e0e0; height: 1px;"></div>
+                                        <div style="background-color: #CBD6D4; height: 1px; margin-bottom: 20px;"></div>
 
                                         <div>
                                             <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 15px;">
                                                 <tr>
                                                     <td width="50%" align="center" style="padding-left: 10px; padding-right: 10px;">
-                                                        <a href="https://x.com/upb_edu" target="_blank" class="etiqueta-a">
-                                                            <img th:src="|cid:${imageX}|" alt="Twitter" title="Twitter" style="max-width: 35px; height: auto;" border="0"/>
+                                                        <a href="https://x.com/nexori_b2b" target="_blank" style="text-decoration: none;">
+                                                            <img th:src="|cid:${imageX}|" alt="Twitter/X" title="Twitter/X" style="max-width: 30px; height: auto;" border="0"/>
                                                         </a>
                                                     </td>
                                                     <td width="50%" align="center" style="padding-left: 10px; padding-right: 10px;">
-                                                        <a href="https://linkedin.com/school/universidad-privada-boliviana" target="_blank" class="etiqueta-a" >
-                                                            <img th:src="|cid:${imageLinkedin}|" title="LinkedIn" alt="LinkedIn" style="max-width: 35px; height: auto;" border="0"/>
+                                                        <a href="https://linkedin.com/company/nexori" target="_blank" style="text-decoration: none;">
+                                                            <img th:src="|cid:${imageLinkedin}|" title="LinkedIn" alt="LinkedIn" style="max-width: 30px; height: auto;" border="0"/>
                                                         </a>
                                                     </td>
                                                 </tr>
                                             </table>
 
-                                            <table style="margin-top: 10px;">
+                                            <table style="margin-top: 15px; width: 100%;">
                                                 <tr>
-                                                    <td>
-                                                        <div style="font-size:12px; font-family:Arial,sans-serif; color:#a1a2b2; line-height:1.2">
+                                                    <td align="center">
+                                                        <div style="font-size:12px; color:#7A938F; line-height:1.2">
                                                             <p style="margin:0; font-size:12px; text-align:center">
                                                                 <strong>
-                                                                    <span style="word-break:break-word; font-size:14px">
-                                                                        <a href="https://www.upb.edu" style="text-decoration:none; color:#a1a2b2" rel="noopener" target="_blank">Acerca de</a> &nbsp;|&nbsp;
-                                                                        <a href="https://api.whatsapp.com/send?phone=59163608144" style="text-decoration:none; color:#a1a2b2" rel="noopener" target="_blank">Contáctanos</a>
+                                                                    <span style="word-break:break-word; font-size:13px">
+                                                                        <a href="https://www.nexori.com" style="text-decoration:none; color:#0F6E56; font-weight: bold;" rel="noopener" target="_blank">Acerca de</a> &nbsp;|&nbsp;
+                                                                        <a href="https://api.whatsapp.com/send?phone=59163608144" style="text-decoration:none; color:#0F6E56; font-weight: bold;" rel="noopener" target="_blank">Soporte B2B</a>
                                                                     </span>
                                                                 </strong>
                                                             </p>
@@ -362,11 +370,11 @@
                                             <table width="100%" border="0" cellpadding="15" cellspacing="0" role="presentation" style="word-break:break-word">
                                                 <tbody>
                                                 <tr>
-                                                    <td>
+                                                    <td style="padding-top: 10px;">
                                                         <div style="font-family:sans-serif">
-                                                            <div style="font-size:12px; color:#a1a2b2; line-height:1.2">
-                                                                <p style="margin:0; font-size:12px; text-align:center">
-                                                                    <span style="text-decoration:none; color:#a1a2b2; font-size:14px">© Universidad Privada Boliviana.<br>Santa Cruz de la Sierra, Bolivia.</span>
+                                                            <div style="font-size:11px; color:#7A938F; line-height:1.3">
+                                                                <p style="margin:0; font-size:11px; text-align:center">
+                                                                    <span style="text-decoration:none; color:#7A938F; font-size:12px;">© 2026 Nexori Inc. Todos los derechos reservados.<br>Plataforma de Facturación Inteligente B2B.</span>
                                                                 </p>
                                                             </div>
                                                         </div>

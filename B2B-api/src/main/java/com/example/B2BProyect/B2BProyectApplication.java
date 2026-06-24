@@ -15,7 +15,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @EnableCaching
 @EnableScheduling
-@EnableCaching
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class B2BProyectApplication implements CommandLineRunner {
 	

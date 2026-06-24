@@ -5,11 +5,14 @@ import com.example.B2BProyect.repository.EmpresaRepository;
 import com.example.B2BProyect.repository.RolUsuarioRepository;
 import com.example.B2BProyect.repository.SucursalEmpresaRepository;
 import com.example.B2BProyect.repository.UsuarioRepository;
+import com.example.B2BProyect.repository.dto.request.RegisterRequest;
 import com.example.B2BProyect.repository.dto.request.UsuarioRequest;
 import com.example.B2BProyect.repository.dto.response.EmpresaDTO;
 import com.example.B2BProyect.repository.dto.response.SucursalEmpresaDTO;
 import com.example.B2BProyect.repository.dto.response.UsuarioDTO;
+import com.example.B2BProyect.repository.entity.Empresa;
 import com.example.B2BProyect.repository.entity.Log;
+import com.example.B2BProyect.repository.entity.SucursalEmpresa;
 import com.example.B2BProyect.repository.entity.Usuario;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import lombok.AllArgsConstructor;
@@ -36,6 +39,9 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final TotpService totpService;
+    private final EmpresaRepository empresaRepository;
+    private final SucursalEmpresaRepository sucursalRepository;
+    private final RolUsuarioRepository rolRepository;
 
     @Transactional
     public void save(UsuarioRequest dto,
@@ -88,7 +94,7 @@ public class UsuarioService {
         return usuarioRepository.findByIdDTO(id);
     }
 
-    @Cacheable(value = "usuarios", key = "#id")
+//    @Cacheable(value = "usuarios", key = "#id")
     @Transactional(readOnly = true)
     public Optional<Usuario> findByEmail(String email) {
         return usuarioRepository.findByEmail(email);
@@ -140,5 +146,41 @@ public class UsuarioService {
         } else{
             throw new RuntimeException("HA OCURRIDO UN PROBLEMA");
         }
+    }
+
+    public void registerNew(RegisterRequest dto) {
+        Usuario usuario = new Usuario();
+        Empresa empresa = new Empresa();
+        SucursalEmpresa sucursal = new SucursalEmpresa();
+        usuario.setNombre(dto.getNombre());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPasswordHash(passwordEncoder.encode(dto.getPassword() != null ? dto.getPassword() : "changeme"));
+        if (dto.getActivo() != null) usuario.setActivo(dto.getActivo());
+        if (dto.getIdEmpresa() != null)
+            empresa = empresaRepository.findById(dto.getIdEmpresa()).orElseThrow();
+        else {
+            empresa.setNombre(dto.getNombreEmpresa());
+            empresa.setDominio(dto.getDominio());
+            empresa.setActivo(true);
+            empresa.setNit(dto.getNit());
+            empresa.setRazonSocial(dto.getRazonSocial());
+            empresa = empresaRepository.save(empresa);
+        }
+        if (dto.getIdSucursal() != null)
+            sucursalRepository.findById(dto.getIdSucursal()).ifPresent(usuario::setIdSucursal);
+        else {
+            sucursal.setNombre(dto.getNombreSucursal());
+            sucursal.setDireccion(dto.getDireccion());
+            sucursal.setCoordenadas(dto.getCoordenadas().toString());
+            sucursal.setActivo(dto.getActivo() != null ? dto.getActivo() : true);
+            sucursal.setIdEmpresa(empresa);
+            sucursal = sucursalRepository.save(sucursal);
+        }
+
+        rolRepository.findById(UUID.fromString("61cd4fe2-1646-4eb0-90f7-2df9e4389444")).ifPresent(usuario::setIdRol);
+
+        usuario.setIdEmpresa(empresa);
+        usuario.setIdSucursal(sucursal);
+        usuarioRepository.save(usuario);
     }
 }
