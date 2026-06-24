@@ -21,7 +21,7 @@ jobs:
           cache: maven
 
       - name: Build JAR with Maven
-        run: mvn clean package -DskipTests -f B2B-api/pom.xml
+        run: mvn clean package -DskipTests
 
       - name: Verify JAR exists
         run: ls -la B2B-api/target/*.jar
