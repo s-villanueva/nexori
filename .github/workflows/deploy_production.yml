@@ -3,7 +3,7 @@ name: Build & Deploy Backend to Azure VM
 on:
   push:
     branches:
-      - backend-b2b
+      - main
 
 jobs:
   build-and-deploy:
@@ -41,5 +41,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
-            docker compose up -d --build --no-deps backend
+            docker compose up -d --build --no-deps b2b-spring
             docker image prune -f
