@@ -45,5 +45,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
-            docker compose up -d --build --no-deps b2b-spring
+            docker compose up -d --build --no-deps spring-app
             docker image prune -f

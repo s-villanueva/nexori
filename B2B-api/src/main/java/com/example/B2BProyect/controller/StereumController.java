@@ -40,6 +40,7 @@ public class StereumController {
 
     @PostMapping("/charge")
     public ResponseEntity<?> charge(@RequestBody PaymentRequest request) {
+        log.info("REQUEST NAME: " + request.getOrderId());
         OrdenCompra ordenCompra = ordenCompraService.findById(request.getOrderId()).get();
         try {
             JSONObject customer = new JSONObject();
@@ -56,6 +57,7 @@ public class StereumController {
             req.put("idempotency_key", ordenCompra.getId().toString());
             req.put("reservation_validity_time", "10");
             req.put("customer", customer);
+            req.put("account_id", "a3ec8479-52f5-4fe5-855b-934b89c126f6");
 
 //            Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //            clientes.put(request.getOrderId(), user.getNombre());
