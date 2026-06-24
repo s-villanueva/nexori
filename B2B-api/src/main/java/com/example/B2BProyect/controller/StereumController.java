@@ -6,6 +6,7 @@ import com.example.B2BProyect.integracion.stereum.StereumPayResponse;
 import com.example.B2BProyect.repository.FacturaRepository;
 import com.example.B2BProyect.repository.entity.Factura;
 import com.example.B2BProyect.repository.entity.OrdenCompra;
+import com.example.B2BProyect.service.FacturaService;
 import com.example.B2BProyect.service.OrdenCompraService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +45,8 @@ public class StereumController {
     private final OrdenCompraService ordenCompraService;
     @Autowired
     private FacturaRepository facturaRepository;
+    @Autowired
+    private FacturaService facturaService;
 
     @PostMapping("/charge")
     public ResponseEntity<?> charge(@RequestBody PaymentRequest request) {
@@ -103,7 +106,9 @@ public class StereumController {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         StereumPayResponse response = objectMapper.readValue(body, StereumPayResponse.class);
-        Factura factura = facturaRepository.findByIdOrdenId(response.getTransaction().getIdempotencyKey());
+        Factura factura = facturaRepository.findById(response.getTransaction().getIdempotencyKey()).orElseThrow();
+        log.info("FACTURA: " + factura.toString());
+        assert(factura != null);
         factura.setIdEstado("pagada");
         factura.setModifiedDate( LocalDateTime.ofInstant( Instant.ofEpochMilli(response.getTimestamp()), ZoneId.systemDefault()));
         facturaRepository.save(factura);
