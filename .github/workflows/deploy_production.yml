@@ -21,7 +21,11 @@ jobs:
           cache: maven
 
       - name: Build JAR with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests -f B2B-api/pom.xml
+
+      - name: Verify JAR exists
+        run: ls -la B2B-api/target/*.jar
+
 
       - name: Copy JAR to VM
         uses: appleboy/scp-action@v0.1.7
@@ -29,7 +33,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "target/*.jar"
+          source: "B2B-api/target/B2B-api-0.0.1-SNAPSHOT.jar"
           target: ${{ secrets.DEPLOY_PATH }}
           strip_components: 1  # elimina el prefijo "target/"
 
