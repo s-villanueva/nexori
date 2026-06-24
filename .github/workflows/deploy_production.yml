@@ -1,56 +1,45 @@
-name: Deploy Production
+name: Build & Deploy Backend to Azure VM
 
 on:
-  workflow_dispatch:
-  # push:
-  #   branches: [main]
+  push:
+    branches:
+      - backend-b2b
 
 jobs:
-  deploy:
-    name: Build & deploy to production
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: 'maven'
+          cache: maven
 
-      - name: Build JAR (prod profile)
-        run: mvn clean package -Denv=prod -DskipTests
+      - name: Build JAR with Maven
+        run: mvn clean package -DskipTests
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H 74.163.80.99 >> ~/.ssh/known_hosts
+      - name: Copy JAR to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "target/*.jar"
+          target: ${{ secrets.DEPLOY_PATH }}
+          strip_components: 1  # elimina el prefijo "target/"
 
-      - name: Upload JAR to server
-        run: |
-          rsync -avz \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            B2B-api/target/*.jar \
-            azureadmin@74.163.80.99:~/Backend-B2B/app.jar
-
-      - name: Restart application
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 74.163.80.99
-          port: 22
-          username: azureadmin
-          key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -e
-            cd ~/Backend-B2B
-            # Pull latest code so git history / resources stay in sync
-            git fetch origin main
-            git reset --hard origin/main
-            # Restart via systemd service (assumed name: b2b-api)
-            sudo systemctl restart b2b-api
-            sudo systemctl status b2b-api --no-pager
+            cd ${{ secrets.DEPLOY_PATH }}
+            docker compose up -d --build --no-deps backend
+            docker image prune -f
