@@ -174,13 +174,16 @@ public class UsuarioService {
             sucursal.setIdEmpresa(empresa);
             sucursal = sucursalRepository.save(sucursal);
         }
-        if (dto.getIdRol() == null && rolRepository.existsByNombre("empresa")) {
+        if (dto.getIdRol() == null && !rolRepository.existsByNombre("empresa")) {
             rolUsuario.setNombre("empresa");
             rolUsuario.setDescripcion("Una Empresa mas mi gente");
             rolUsuario = rolRepository.save(rolUsuario);
-        } else if (dto.getIdRol() == null){
+        } else if (dto.getIdRol() != null){
+            rolUsuario = rolRepository.findById(dto.getIdRol()).orElseThrow();
+        } else {
             rolUsuario = rolRepository.findByNombre("empresa");
         }
+        log.info("ROL DE USUARIO: " + rolUsuario.getNombre());
         usuario.setIdRol(rolUsuario);
         usuario.setIdEmpresa(empresa);
         usuario.setIdSucursal(sucursal);
