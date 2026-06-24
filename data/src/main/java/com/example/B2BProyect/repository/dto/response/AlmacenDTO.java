@@ -19,7 +19,7 @@ public class AlmacenDTO {
     private UUID id;
     private String nombre;
     private String direccion;
-    private Point coordenadas;
+//    private Point coordenadas;
     private Boolean activo;
     private String nombreProveedor;
 
@@ -29,18 +29,18 @@ public class AlmacenDTO {
         this.id = almacen.getId();
         this.nombre = almacen.getNombre();
         this.direccion = almacen.getDireccion();
-        this.coordenadas = almacen.getCoordenadas();
+//        this.coordenadas = almacen.getCoordenadas();
         this.activo = almacen.getActivo();
         this.idProveedor = new ProveedorDTO(almacen.getIdProveedor());
     }
 
-    public AlmacenDTO(UUID id, String nombre, String direccion, Point coordenadas,
+    public AlmacenDTO(UUID id, String nombre, String direccion,
                       Boolean activo, String nombreProveedor) {
         this.id = id;
         this.nombre = nombre;
         this.direccion = direccion;
         this.activo = activo;
-        this.coordenadas = coordenadas;
+//        this.coordenadas = coordenadas;
         this.nombreProveedor = nombreProveedor;
     }
 
@@ -50,7 +50,6 @@ public class AlmacenDTO {
         this.nombre = nombre;
         this.direccion = direccion;
         this.activo = activo;
-        this.coordenadas = coordenadas;
         this.idProveedor = new ProveedorDTO(idProveedor);
     }
 

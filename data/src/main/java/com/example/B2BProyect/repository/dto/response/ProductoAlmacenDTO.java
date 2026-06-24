@@ -28,8 +28,8 @@ public class ProductoAlmacenDTO {
     private ProductoDTO producto;
 
     public ProductoAlmacenDTO(ProductoAlmacen productoAlmacen) {
-        this.idAlmacen = productoAlmacen.getId().getIdAlmacen();
-        this.idProducto = productoAlmacen.getId().getIdProducto();
+//        this.idAlmacen = productoAlmacen.getId().getIdAlmacen();
+//        this.idProducto = productoAlmacen.getId().getIdProducto();
         this.stock = productoAlmacen.getStock();
         this.max = productoAlmacen.getMax();
         this.min = productoAlmacen.getMin();

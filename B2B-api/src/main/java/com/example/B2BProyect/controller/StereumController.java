@@ -80,43 +80,43 @@ public class StereumController {
 
     @Autowired
     private SimpMessagingTemplate template;
-//    @PostMapping(value = "/outbound", produces = MediaType.APPLICATION_JSON_VALUE, consumes = {MediaType.APPLICATION_JSON_VALUE})
-//    public ResponseEntity<Void> outbound(
-//            @RequestHeader("X-Signature") String signature,
-//            @RequestHeader("X-Timestamp") int tiempo,
-//            @RequestBody String body) throws Exception {
-//
-//        final ObjectMapper mapper = new ObjectMapper();
-//
-//        String hmac = new HmacUtils("HmacSHA256",
-//                secretKey.getBytes(StandardCharsets.UTF_8))
-//                .hmacHex(body.getBytes(StandardCharsets.UTF_8));
-//
-//        if (!signature.equals(hmac)) {
-//            log.info("X-Signature recibido: {}", signature);
-//            throw new Exception("MessageCode.SIGN_REQUEST_INVALID");
-//        }
-//
-//        if (System.currentTimeMillis() / 1000 - tiempo >= 3000)
-//            throw new Exception("MessageCode.TIEMPO_INVALIDO");
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        StereumPayResponse response = objectMapper.readValue(body, StereumPayResponse.class);
-//        Factura factura = facturaRepository.findByIdOrdenId(response.getTransaction().getIdempotencyKey());
-//        factura.setIdEstado("pagada");
-//        factura.setModifiedDate( LocalDateTime.ofInstant( Instant.ofEpochMilli(response.getTimestamp()), ZoneId.systemDefault()));
-//        facturaRepository.save(factura);
-////        template.convertAndSend("/paymenting/" + response.getTransaction().getIdempotencyKey(), response.getTransaction().getStatus());
-//        return ok().build();
-//    }
     @PostMapping(value = "/outbound", produces = MediaType.APPLICATION_JSON_VALUE, consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> outbound(
             @RequestHeader("X-Signature") String signature,
             @RequestHeader("X-Timestamp") int tiempo,
             @RequestBody String body) throws Exception {
 
-        return ResponseEntity.ok().build();
+        final ObjectMapper mapper = new ObjectMapper();
+
+        String hmac = new HmacUtils("HmacSHA256",
+                secretKey.getBytes(StandardCharsets.UTF_8))
+                .hmacHex(body.getBytes(StandardCharsets.UTF_8));
+
+        if (!signature.equals(hmac)) {
+            log.info("X-Signature recibido: {}", signature);
+            throw new Exception("MessageCode.SIGN_REQUEST_INVALID");
+        }
+
+        if (System.currentTimeMillis() / 1000 - tiempo >= 3000)
+            throw new Exception("MessageCode.TIEMPO_INVALIDO");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        StereumPayResponse response = objectMapper.readValue(body, StereumPayResponse.class);
+        Factura factura = facturaRepository.findByIdOrdenId(response.getTransaction().getIdempotencyKey());
+        factura.setIdEstado("pagada");
+        factura.setModifiedDate( LocalDateTime.ofInstant( Instant.ofEpochMilli(response.getTimestamp()), ZoneId.systemDefault()));
+        facturaRepository.save(factura);
+//        template.convertAndSend("/paymenting/" + response.getTransaction().getIdempotencyKey(), response.getTransaction().getStatus());
+        return ok().build();
     }
+//    @PostMapping(value = "/outbound", produces = MediaType.APPLICATION_JSON_VALUE, consumes = {MediaType.APPLICATION_JSON_VALUE})
+//    public ResponseEntity<Void> outbound(
+//            @RequestHeader("X-Signature") String signature,
+//            @RequestHeader("X-Timestamp") int tiempo,
+//            @RequestBody String body) throws Exception {
+//
+//        return ResponseEntity.ok().build();
+//    }
 
 }

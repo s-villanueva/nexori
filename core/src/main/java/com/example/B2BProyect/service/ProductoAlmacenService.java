@@ -1,11 +1,18 @@
 package com.example.B2BProyect.service;
 
+import com.example.B2BProyect.repository.AlmacenRepository;
 import com.example.B2BProyect.repository.ProductoAlmacenRepository;
+import com.example.B2BProyect.repository.ProductoRepository;
 import com.example.B2BProyect.repository.dto.request.ProductoAlmacenRequest;
 import com.example.B2BProyect.repository.dto.response.ProductoAlmacenDTO;
+import com.example.B2BProyect.repository.entity.Almacen;
+import com.example.B2BProyect.repository.entity.Producto;
 import com.example.B2BProyect.repository.entity.ProductoAlmacen;
 import com.example.B2BProyect.repository.entity.ProductoAlmacenId;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,26 +20,39 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProductoAlmacenService {
     private final ProductoAlmacenRepository productoAlmacenRepository;
     private final AlmacenService almacenService;
     private final ProductoService productoService;
+    private final AlmacenRepository almacenRepository;
+    private final ProductoRepository productoRepository;
 
     @Transactional
-    public void save(ProductoAlmacenRequest request) {
-        ProductoAlmacen productoAlmacen = new ProductoAlmacen();
+    public void save(@NonNull ProductoAlmacenRequest request) {
+        Almacen almacen = almacenRepository.findById(request.getIdAlmacen())
+                .orElseThrow(() -> new EntityNotFoundException("Almacén no encontrado: " + request.getIdAlmacen()));
+        Producto producto = productoRepository.findById(request.getIdProducto())
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado: " + request.getIdProducto()));
+
+        log.info("ALMACEN" + almacen.getNombre());
+        log.info("PRODUCTO" + producto.getNombre());
+
         ProductoAlmacenId id = new ProductoAlmacenId();
         id.setIdAlmacen(request.getIdAlmacen());
         id.setIdProducto(request.getIdProducto());
+
+        ProductoAlmacen productoAlmacen = new ProductoAlmacen();
         productoAlmacen.setId(id);
+        productoAlmacen.setAlmacen(almacen);   // ← asociar la entidad
+        productoAlmacen.setProducto(producto); // ← asociar la entidad
         productoAlmacen.setStock(request.getStock());
         productoAlmacen.setMax(request.getMax());
         productoAlmacen.setMin(request.getMin());
         productoAlmacen.setActivo(request.getActivo());
-        almacenService.findById(request.getIdAlmacen()).ifPresent(productoAlmacen::setAlmacen);
-        productoService.findById(request.getIdProducto()).ifPresent(productoAlmacen::setProducto);
+
         productoAlmacenRepository.save(productoAlmacen);
     }
 

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Embeddable
 public class ProductoAlmacenId implements Serializable {
     private static final long serialVersionUID = -3726749609239796637L;
+
     @Column(name = "id_almacen", nullable = false)
     private UUID idAlmacen;
 

@@ -50,6 +50,7 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
 
     @Query("""
 SELECT new com.example.B2BProyect.repository.dto.response.ProductoDTO(
+    pr.id,
     pr.sku,
     pr.nombre,
     pr.descripcion,

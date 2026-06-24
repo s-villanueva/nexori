@@ -24,7 +24,8 @@ public class ProductoDTO {
     private CategoriaDTO idCategoria;
     private ProveedorDTO idProveedor;
 
-    public ProductoDTO(String sku, String nombre, String descripcion, String unidadMedida, BigDecimal precioBase) {
+    public ProductoDTO(UUID id, String sku, String nombre, String descripcion, String unidadMedida, BigDecimal precioBase) {
+        this.id = id;
         this.sku = sku;
         this.nombre = nombre;
         this.descripcion = descripcion;

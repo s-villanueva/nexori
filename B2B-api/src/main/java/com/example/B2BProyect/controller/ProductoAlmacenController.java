@@ -5,6 +5,7 @@ import com.example.B2BProyect.repository.dto.request.ProductoAlmacenRequest;
 import com.example.B2BProyect.repository.dto.response.ProductoAlmacenDTO;
 import com.example.B2BProyect.repository.entity.ProductoAlmacenId;
 import com.example.B2BProyect.service.ProductoAlmacenService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,9 @@ public class ProductoAlmacenController {
         } catch (OperationException e) {
             log.error("OperationException: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (EntityNotFoundException e){
+            log.error(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             log.error("Error creando producto-almacén: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico");
@@ -78,8 +82,8 @@ public class ProductoAlmacenController {
                                                       @RequestBody ProductoAlmacenRequest dto) {
         try {
             ProductoAlmacenId id = new ProductoAlmacenId();
-            id.setIdAlmacen(idAlmacen);
-            id.setIdProducto(idProducto);
+//            id.setIdAlmacen(idAlmacen);
+//            id.setIdProducto(idProducto);
             return productoAlmacenService.update(id, dto)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
@@ -97,8 +101,8 @@ public class ProductoAlmacenController {
                                        @PathVariable UUID idProducto) {
         try {
             ProductoAlmacenId id = new ProductoAlmacenId();
-            id.setIdAlmacen(idAlmacen);
-            id.setIdProducto(idProducto);
+//            id.setIdAlmacen(idAlmacen);
+//            id.setIdProducto(idProducto);
             return productoAlmacenService.delete(id)
                     ? ResponseEntity.noContent().build()
                     : ResponseEntity.notFound().build();
