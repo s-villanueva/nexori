@@ -96,9 +96,9 @@ public class StereumController {
             log.info("X-Signature recibido: {}", signature);
             throw new Exception("MessageCode.SIGN_REQUEST_INVALID");
         }
-
-        if (System.currentTimeMillis() / 1000 - tiempo >= 3000)
-            throw new Exception("MessageCode.TIEMPO_INVALIDO");
+//
+//        if (System.currentTimeMillis() / 1000 - tiempo >= 3000)
+//            throw new Exception("MessageCode.TIEMPO_INVALIDO");
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
