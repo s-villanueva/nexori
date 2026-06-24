@@ -47,3 +47,18 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }}
             docker compose up -d --build --no-deps b2b-spring
             docker image prune -f
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}
+            echo "=== Contenedor corriendo ==="
+            docker compose ps backend
+            echo "=== JAR en el servidor ==="
+            ls -lh *.jar
+            echo "=== Últimos logs del backend ==="
+            docker compose logs --tail=20 backend
