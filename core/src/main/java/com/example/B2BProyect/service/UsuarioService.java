@@ -10,10 +10,7 @@ import com.example.B2BProyect.repository.dto.request.UsuarioRequest;
 import com.example.B2BProyect.repository.dto.response.EmpresaDTO;
 import com.example.B2BProyect.repository.dto.response.SucursalEmpresaDTO;
 import com.example.B2BProyect.repository.dto.response.UsuarioDTO;
-import com.example.B2BProyect.repository.entity.Empresa;
-import com.example.B2BProyect.repository.entity.Log;
-import com.example.B2BProyect.repository.entity.SucursalEmpresa;
-import com.example.B2BProyect.repository.entity.Usuario;
+import com.example.B2BProyect.repository.entity.*;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -151,6 +148,7 @@ public class UsuarioService {
     public void registerNew(RegisterRequest dto) {
         Usuario usuario = new Usuario();
         Empresa empresa = new Empresa();
+        RolUsuario rolUsuario = new RolUsuario();
         SucursalEmpresa sucursal = new SucursalEmpresa();
         usuario.setNombre(dto.getNombre());
         usuario.setEmail(dto.getEmail());
@@ -176,9 +174,14 @@ public class UsuarioService {
             sucursal.setIdEmpresa(empresa);
             sucursal = sucursalRepository.save(sucursal);
         }
-
-        rolRepository.findById(UUID.fromString("61cd4fe2-1646-4eb0-90f7-2df9e4389444")).ifPresent(usuario::setIdRol);
-
+        if (dto.getIdRol() == null && rolRepository.existsByNombre("empresa")) {
+            rolUsuario.setNombre("empresa");
+            rolUsuario.setDescripcion("Una Empresa mas mi gente");
+            rolUsuario = rolRepository.save(rolUsuario);
+        } else if (dto.getIdRol() == null){
+            rolUsuario = rolRepository.findByNombre("empresa");
+        }
+        usuario.setIdRol(rolUsuario);
         usuario.setIdEmpresa(empresa);
         usuario.setIdSucursal(sucursal);
         usuarioRepository.save(usuario);
