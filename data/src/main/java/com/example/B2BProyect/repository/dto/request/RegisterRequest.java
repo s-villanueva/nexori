@@ -36,4 +36,9 @@ public class RegisterRequest {
 
     @JsonProperty("id_rol")
     private UUID idRol;
+
+    private String nombreContacto;
+    private String apellidoContacto;
+    private String emailContacto;
+    private String cargoContacto;
 }

@@ -82,10 +82,8 @@ public class OrdenCompraController {
 
     @PostMapping
     public ResponseEntity<OrdenCompraDTO> save(@RequestBody OrdenCompraRequest dto) {
-        UUID idempotency = UUID.randomUUID();
         try {
-            log.info(String.valueOf(dto));
-            OrdenCompraDTO created = ordenCompraService.save(dto, idempotency);
+            OrdenCompraDTO created = ordenCompraService.save(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (Exception e) {
             log.error("Error creando orden compra: {}", e.getMessage());

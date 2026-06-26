@@ -33,9 +33,8 @@ public class OrdenCompraService {
     private final FacturaRepository facturaRepository;
 
     @Transactional
-    public OrdenCompraDTO save(OrdenCompraRequest request, UUID idempotency) {
-
-        // Idempotencia real: si ya existe, devuelve la existente
+    public OrdenCompraDTO save(OrdenCompraRequest request) {
+        UUID idempotency = UUID.randomUUID();
         Optional<OrdenCompra> existing = ordenCompraRepository.findById(idempotency);
         if (existing.isPresent()) {
             log.info("Orden ya existe, retornando existente: {}", idempotency);
@@ -47,7 +46,6 @@ public class OrdenCompraService {
         orden.setTotal(request.getTotal());
         orden.setFecha(request.getFecha());
         orden.setFechaOrden(request.getFechaOrden());
-        // ❌ orden.setVersion(...) — eliminar, Hibernate lo maneja solo
         orden.setIdEstado(request.getIdEstado() != null ? request.getIdEstado() : "pendiente");
 
         if (request.getIdUsuario() != null) {

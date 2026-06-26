@@ -2,6 +2,7 @@ package com.example.B2BProyect.repository;
 
 import com.example.B2BProyect.repository.dto.response.PrecioBaseDTO;
 import com.example.B2BProyect.repository.entity.PrecioBase;
+import com.example.B2BProyect.repository.entity.Producto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,4 +47,8 @@ public interface PrecioBaseRepository extends JpaRepository<PrecioBase, UUID> {
             "pb.idProveedor.idEmpresa.nombre, pb.idProducto.nombre, pb.idProducto.sku) FROM PrecioBase pb WHERE " +
             "pb.idProveedor.idEmpresa.id=:pIdEmpresa")
     Page<PrecioBaseDTO> findAllofProvider(@Param("pIdEmpresa") UUID pIdEmpresa, Pageable pageable);
+
+    List<PrecioBase> findByIdProducto(Producto idProducto);
+
+    PrecioBase findByIdProductoId(UUID idProductoId);
 }

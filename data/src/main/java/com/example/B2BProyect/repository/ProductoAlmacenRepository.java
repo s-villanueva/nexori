@@ -55,7 +55,8 @@ SELECT new com.example.B2BProyect.repository.dto.response.ProductoAlmacenDTO(
     pa.almacen.nombre,
     pa.producto.nombre,
     pa.almacen.idProveedor.id,
-    pr.precioBase
+    pr.precioBase,
+    pa.id.idProducto
 )
 FROM ProductoAlmacen pa
 JOIN PrecioBase pr

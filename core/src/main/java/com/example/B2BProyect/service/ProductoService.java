@@ -73,11 +73,14 @@ public class ProductoService {
     }
 
     @Transactional
-    public Integer manageCsvFile(MultipartFile file, UUID id){
-        Empresa empresa = empresaService.findById(id).orElseThrow();
+    public Integer manageCsvFile(MultipartFile file, UUID idEmpresa, UUID idCategoria){
+        Empresa empresa = empresaService.findById(idEmpresa).orElseThrow();
         Set<ProductoRequest> productos = parseCsv(file);
-        productos.forEach(productoRequest -> { productoRequest.setCreatedBy(empresa.getNombre());
-            productoRequest.setIdEmpresa(empresa.getId()); });
+        productos.forEach(productoRequest -> {
+            productoRequest.setCreatedBy(empresa.getNombre());
+            productoRequest.setIdEmpresa(empresa.getId());
+            productoRequest.setIdCategoria(idCategoria);
+        });
         List<Producto> prods = prepareData(productos);
         productoRepository.saveAll(prods);
         return prods.size();
@@ -146,27 +149,31 @@ public class ProductoService {
         return productoRepository.findById(id);
     }
 
-    @CacheEvict(cacheNames = "productos", allEntries = true)
     @Transactional
-    public Optional<ProductoDTO> update(UUID id, ProductoRequest dto) {
-        return productoRepository.findById(id).map(producto -> {
-            if (dto.getSku() != null)          producto.setSku(dto.getSku());
-            if (dto.getNombre() != null)       producto.setNombre(dto.getNombre());
-            if (dto.getDescripcion() != null)  producto.setDescripcion(dto.getDescripcion());
-            if (dto.getUnidadMedida() != null) producto.setUnidadMedida(dto.getUnidadMedida());
-            if (dto.getActivo() != null)       producto.setActivo(dto.getActivo());
-            if (dto.getIdCategoria() != null)
-                categoriaService.findById(dto.getIdCategoria()).ifPresent(producto::setIdCategoria);
-            if (dto.getIdEmpresa() != null)
-                producto.setIdProveedor(proveedorService.findByIdEmpresa(dto.getIdEmpresa()));
-            return new ProductoDTO(productoRepository.save(producto));
-        });
+    public void update(UUID id, ProductoRequest dto) {
+        Producto producto = productoRepository.findById(id).orElseThrow();
+        if (dto.getSku() != null)          producto.setSku(dto.getSku());
+        if (dto.getNombre() != null)       producto.setNombre(dto.getNombre());
+        if (dto.getDescripcion() != null)  producto.setDescripcion(dto.getDescripcion());
+        if (dto.getUnidadMedida() != null) producto.setUnidadMedida(dto.getUnidadMedida());
+        if (dto.getActivo() != null)       producto.setActivo(dto.getActivo());
+        if (dto.getIdCategoria() != null)
+            categoriaService.findById(dto.getIdCategoria()).ifPresent(producto::setIdCategoria);
+        if (dto.getIdEmpresa() != null)
+            producto.setIdProveedor(proveedorService.findByIdEmpresa(dto.getIdEmpresa()));
+        if (dto.getPrecioBase() != null) {
+            PrecioBase pr = precioBaseRepository.findByIdProductoId(id);
+            if (!Objects.equals(pr.getPrecioBase(), dto.getPrecioBase())){
+                pr.setPrecioBase(dto.getPrecioBase());
+                precioBaseRepository.save(pr);
+            }
+        }
+        productoRepository.save(producto);
     }
 
     @Transactional(readOnly = true)
     public List<ProductoDTO> findByProveedor(UUID idProveedor) {
-        return productoRepository.findByIdProveedorId(idProveedor)
-                .stream().map(ProductoDTO::new).toList();
+        return productoRepository.findByIdProveedorId(idProveedor);
     }
 
     @CacheEvict(cacheNames = "productos", allEntries = true)

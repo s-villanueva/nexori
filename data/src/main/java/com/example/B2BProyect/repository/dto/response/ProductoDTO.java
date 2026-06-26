@@ -71,4 +71,14 @@ public class ProductoDTO {
         if (idCategoria != null) this.idCategoria = new CategoriaDTO(idCategoria);
         if (idProveedor != null) this.idProveedor = new ProveedorDTO(idProveedor);
     }
+
+    public ProductoDTO(UUID id, String sku, String nombre, String descripcion, String unidadMedida, String nombreCategoria, BigDecimal precioBase) {
+        this.id = id;
+        this.sku = sku;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.unidadMedida = unidadMedida;
+        this.precioBase = precioBase;
+        this.nombreCategoria = nombreCategoria;
+    }
 }

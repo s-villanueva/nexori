@@ -1,6 +1,5 @@
 package com.example.B2BProyect.repository.dto.response;
 
-import com.example.B2BProyect.repository.entity.CargoEmpresa;
 import com.example.B2BProyect.repository.entity.ContactosEmpresa;
 import com.example.B2BProyect.repository.entity.Empresa;
 import lombok.Getter;
@@ -22,7 +21,6 @@ public class ContactosEmpresaDTO {
         this.id = contacto.getId();
         this.nombres = contacto.getNombres();
         this.apellidos = contacto.getApellidos();
-        this.nombreCargoEmpresa = contacto.getIdCargoEmpresa().getNombre();
         this.idEmpresa = new EmpresaDTO(contacto.getIdEmpresa());
     }
 
@@ -35,12 +33,11 @@ public class ContactosEmpresaDTO {
         this.nombreEmpresa = nombreEmpresa;
     }
 
-    public ContactosEmpresaDTO(UUID id, String nombres, String apellidos,
-                                CargoEmpresa idCargoEmpresa, Empresa idEmpresa) {
+    public ContactosEmpresaDTO(UUID id, String nombres, String apellidos, String cargo, Empresa idEmpresa) {
         this.id = id;
         this.nombres = nombres;
         this.apellidos = apellidos;
-        this.nombreCargoEmpresa = idCargoEmpresa.getNombre();
+        this.nombreCargoEmpresa = cargo;
         this.idEmpresa = new EmpresaDTO(idEmpresa);
     }
 }

@@ -39,7 +39,7 @@ public class ProductoAlmacenDTO {
     }
 
     public ProductoAlmacenDTO(Integer stock, BigDecimal max, BigDecimal min,
-                               Boolean activo, String nombreAlmacen, String nombreProducto,UUID idProveedor, BigDecimal precioBase) {
+                               Boolean activo, String nombreAlmacen, String nombreProducto,UUID idProveedor, BigDecimal precioBase, UUID idProducto) {
         this.stock = stock;
         this.max = max;
         this.min = min;
@@ -47,6 +47,7 @@ public class ProductoAlmacenDTO {
         this.nombreAlmacen = nombreAlmacen;
         this.nombreProducto = nombreProducto;
         this.idProveedor = idProveedor;
+        this.idProducto = idProducto;
         this.precioBase = precioBase;
     }
 

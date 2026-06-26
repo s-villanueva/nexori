@@ -50,9 +50,9 @@ public class ProductoController {
     }
 
     @PostMapping(value = "/bulk-upload", consumes = "multipart/form-data")
-    public ResponseEntity<Integer> uploadBulkProducts(@RequestParam("file") MultipartFile file, @RequestParam String idEmpresa){
+    public ResponseEntity<Integer> uploadBulkProducts(@RequestParam("file") MultipartFile file, @RequestParam String idEmpresa, @RequestParam String idCategoria){
         try {
-            return ResponseEntity.ok(productoService.manageCsvFile(file, UUID.fromString(idEmpresa)));
+            return ResponseEntity.ok(productoService.manageCsvFile(file, UUID.fromString(idEmpresa), UUID.fromString(idCategoria)));
         } catch (Exception e){
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -100,11 +100,10 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductoDTO> update(@PathVariable UUID id, @RequestBody ProductoRequest dto) {
+    public ResponseEntity<Void> update(@PathVariable UUID id, @RequestBody ProductoRequest dto) {
         try {
-            return productoService.update(id, dto)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
+            productoService.update(id, dto);
+            return ResponseEntity.ok().build();
         } catch (OperationException e) {
             log.error("Error actualizando producto: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
