@@ -6,6 +6,7 @@ import com.example.B2BProyect.integracion.stereum.StereumPayResponse;
 import com.example.B2BProyect.repository.FacturaRepository;
 import com.example.B2BProyect.repository.entity.Factura;
 import com.example.B2BProyect.repository.entity.OrdenCompra;
+import com.example.B2BProyect.service.EmailService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,8 @@ public class SistemaB2B {
     @Autowired
     private FacturaRepository facturaRepository;
     private String token;
+    @Autowired
+    private EmailService emailService;
 
     public B2BAuthResponse auth(JSONObject request) throws Exception {
         RestClient restClient = create();
@@ -140,6 +143,7 @@ public class SistemaB2B {
         factura.setIdEstado("pagada");
         factura.setModifiedDate( LocalDateTime.ofInstant( Instant.ofEpochMilli(response.getTimestamp()), ZoneId.systemDefault()));
         facturaRepository.save(factura);
+        emailService.sendFactura(factura.getIdOrden().getIdUsuario().getEmail(), factura);
     }
 
 //    public List<B2BEmpresasResponse> listCategorias() throws Exception {

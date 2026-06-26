@@ -21,6 +21,10 @@ public class Proveedor extends AuditableEntity {
     @ColumnDefault("gen_random_uuid()")
     @Column(name = "id_proveedor", nullable = false)
     private UUID id;
+//
+//    @ColumnDefault("false")
+//    @Column(name = "verificado", nullable = false)
+//    private Boolean verificado = false;
 
     @ColumnDefault("true")
     @Column(name = "activo", nullable = false)
