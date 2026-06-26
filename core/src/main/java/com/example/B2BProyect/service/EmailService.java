@@ -52,6 +52,7 @@ public class EmailService {
         javaMailSender.send(messagePreparator);
     }
 
+    @Async("taskLog")
     public void sendFactura(String to, Factura factura) {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");

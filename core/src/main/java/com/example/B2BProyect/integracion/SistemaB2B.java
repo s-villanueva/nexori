@@ -29,25 +29,15 @@ import java.time.ZoneId;
 @Service
 public class SistemaB2B {
 
-//    @Value("${sistemaB2B.url-base}")
-//    private String urlBase;
-
     @Value("${stereum.api.url}")
     private String stereumUrl;
     @Value("${stereum.api.key}")
     private String secretKey;
 
-//    @Value("${sistemaB2B.connect-timeout:10000}")
-//    private int connectTimeout;
-//
-//    @Value("${bsistemaB2B2b.read-timeout:40000}")
-//    private int readTimeout;
-
     @Value("${stereum.api.key}")
     private String stereumToken;
     @Autowired
     private FacturaRepository facturaRepository;
-    private String token;
     @Autowired
     private EmailService emailService;
 
@@ -140,90 +130,16 @@ public class SistemaB2B {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         StereumPayResponse response = objectMapper.readValue(body, StereumPayResponse.class);
         Factura factura = facturaRepository.findById(response.getTransaction().getIdempotencyKey()).orElseThrow();
-        factura.setIdEstado("pagada");
         factura.setModifiedDate( LocalDateTime.ofInstant( Instant.ofEpochMilli(response.getTimestamp()), ZoneId.systemDefault()));
+        if (!factura.getIdEstado().equals("pagada"))
+            emailService.sendFactura(factura.getIdOrden().getIdUsuario().getEmail(), factura);
+        factura.setIdEstado("pagada");
         facturaRepository.save(factura);
-        emailService.sendFactura(factura.getIdOrden().getIdUsuario().getEmail(), factura);
     }
 
-//    public List<B2BEmpresasResponse> listCategorias() throws Exception {
-//        RestClient restClient = create();
-//        try {
-//            return restClient.get()
-//                    .uri(urlBase + "/api/v1/empresas")
-//                    .accept(MediaType.APPLICATION_JSON)
-//                    .header("Authorization", "Bearer " + token)
-//                    .retrieve()
-//                    .body(new ParameterizedTypeReference<>() {});
-//        } catch (Exception e) {
-//            log.error("Error calling B2B /empresas. ", e);
-//            throw e;
-//        }
-//    }
-//
-//    public UsersMeResponse list2() throws Exception {
-//        RestClient restClient = create();
-//        try {
-//            return restClient.get()
-//                    .uri(urlBase + "/api/v1/users/me")
-//                    .accept(MediaType.APPLICATION_JSON)
-//                    .header("Authorization", "Bearer " + token)
-//                    .retrieve()
-//                    .body(new ParameterizedTypeReference<>() {});
-//        } catch (Exception e) {
-//            log.error("Error calling B2B /users/me. ", e);
-//            throw e;
-//        }
-//    }
-
-    /*public StereumQuoteResponse createQuote(StereumQuoteRequest request) throws Exception {
-        RestClient restClient = create();
-
-        ResponseEntity<StereumQuoteResponse> response;
-        try {
-            response = restClient.post()
-                    .uri(stereumUrl + "/api/v1/otc/quotes")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .header("x-api-key", stereumToken)
-                    .body(request)
-                    .retrieve()
-                    .toEntity(StereumQuoteResponse.class);
-        } catch (Exception e) {
-            log.error("Error calling Stereum createQuote. ", e);
-            throw e;
-        }
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            log.error("Stereum createQuote failed with status: {}", response.getStatusCode().value());
-            throw new Exception("Stereum createQuote failed");
-        }
-
-        log.info("Stereum quote response: {}", response.getBody());
-        return response.getBody();
-    }
-
-    public List<StereumBankResponse> listBanks(String country) throws Exception {
-        RestClient restClient = create();
-        try {
-            List<StereumBankResponse> banks = restClient.get()
-                    .uri(stereumUrl + "/api/v1/banks?country=" + country)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .header("x-api-key", stereumToken)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {});
-            log.info("Stereum banks for {}: {}", country, banks);
-            return banks;
-        } catch (Exception e) {
-            log.error("Error calling Stereum listBanks. ", e);
-            throw e;
-        }
-    }*/
 
     private RestClient create() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-//        factory.setConnectTimeout(Duration.ofMillis(connectTimeout));
-//        factory.setReadTimeout(Duration.ofMillis(readTimeout));
         return RestClient.builder().requestFactory(factory).build();
     }
 }
