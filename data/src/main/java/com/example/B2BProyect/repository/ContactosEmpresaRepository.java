@@ -13,19 +13,19 @@ import java.util.UUID;
 public interface ContactosEmpresaRepository extends JpaRepository<ContactosEmpresa, UUID> {
     @Query("SELECT new " +
             "com.example.B2BProyect.repository.dto.response.ContactosEmpresaDTO(" +
-            "ce.id, ce.nombres, ce.apellidos, ce.idCargoEmpresa.nombre, ce.idEmpresa.nombre) " +
+            "ce.id, ce.nombres, ce.apellidos, ce.cargo, ce.idEmpresa.nombre) " +
             "FROM ContactosEmpresa ce WHERE ce.idEmpresa.nombre = :pNombre")
     List<ContactosEmpresaDTO> findByEmpresaDTO(@Param("pNombre") String pNombre);
 
     @Query("SELECT new" +
             " com.example.B2BProyect.repository.dto.response.ContactosEmpresaDTO(" +
-            "ce.id, ce.nombres, ce.apellidos, ce.idCargoEmpresa.nombre, ce.idEmpresa.nombre)" +
+            "ce.id, ce.nombres, ce.apellidos, ce.cargo, ce.idEmpresa.nombre)" +
             " FROM ContactosEmpresa ce")
     List<ContactosEmpresaDTO> findAllDTO();
 
     @Query("SELECT new " +
             "com.example.B2BProyect.repository.dto.response.ContactosEmpresaDTO(" +
-            "ce.id, ce.nombres, ce.apellidos, ce.idCargoEmpresa.nombre, ce.idEmpresa.nombre)" +
+            "ce.id, ce.nombres, ce.apellidos, ce.cargo, ce.idEmpresa.nombre)" +
             " FROM ContactosEmpresa ce WHERE ce.id = :pId")
     Optional<ContactosEmpresaDTO> findByIdDTO(@Param("pId") UUID pId);
 }
