@@ -60,6 +60,16 @@ public class OrdenCompraController {
         }
     }
 
+    @GetMapping("/stats")
+    public ResponseEntity<OrdenEmpresaStats> retrieveStats(
+            @RequestParam String idEmpresa){
+        try {
+            return ResponseEntity.ok(ordenCompraService.retrieveStats(UUID.fromString(idEmpresa)));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/paged")
     public ResponseEntity<Page<OrdenCompraDTO>> findAllPaged(
             @RequestParam(defaultValue = "0") int page,
@@ -72,14 +82,6 @@ public class OrdenCompraController {
         }
     }
 
-    private final StereumService stereumService;
-    private final SistemaB2B sistemaB2B;
-    private final UsuarioService usuarioService;
-    private final ProveedorService proveedorService;
-    private final EmpresaService empresaService;
-    @Autowired
-    private SimpMessagingTemplate template;
-
     @PostMapping
     public ResponseEntity<OrdenCompraDTO> save(@RequestBody OrdenCompraRequest dto) {
         try {
@@ -88,6 +90,16 @@ public class OrdenCompraController {
         } catch (Exception e) {
             log.error("Error creando orden compra: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/update-status")
+    public ResponseEntity<Void> updateStatus(@RequestBody OrdenUpdateRequest ordenUpdateRequest){
+        try{
+            ordenCompraService.updateStatus(ordenUpdateRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e){
+            throw e;
         }
     }
 
@@ -103,16 +115,6 @@ public class OrdenCompraController {
         }
     }
 
-    @PostMapping("/update-status")
-    public ResponseEntity<Void> updateStatus(@RequestBody OrdenUpdateRequest ordenUpdateRequest){
-        try{
-            ordenCompraService.updateStatus(ordenUpdateRequest);
-            return ResponseEntity.ok().build();
-        } catch (Exception e){
-            throw e;
-        }
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         try {
@@ -121,15 +123,6 @@ public class OrdenCompraController {
                     : ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Error eliminando orden compra: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    @GetMapping("/stats")
-    public ResponseEntity<OrdenEmpresaStats> retrieveStats(
-            @RequestParam String idEmpresa){
-        try {
-            return ResponseEntity.ok(ordenCompraService.retrieveStats(UUID.fromString(idEmpresa)));
-        } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }

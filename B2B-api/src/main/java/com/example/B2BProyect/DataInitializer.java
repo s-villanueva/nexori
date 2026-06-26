@@ -44,8 +44,6 @@ public class DataInitializer implements CommandLineRunner {
     private final SucursalEmpresaRepository sucursalEmpresaRepository;
     private final UsuarioRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
-    private final JobService jobService;
 
     @Override
     public void run(String... args) throws Exception {

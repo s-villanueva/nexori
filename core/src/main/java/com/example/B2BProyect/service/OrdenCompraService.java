@@ -1,11 +1,15 @@
 package com.example.B2BProyect.service;
 
+import com.example.B2BProyect.repository.DetalleOrdenRepository;
 import com.example.B2BProyect.repository.FacturaRepository;
 import com.example.B2BProyect.repository.OrdenCompraRepository;
+import com.example.B2BProyect.repository.dto.request.DetalleOrdenRequest;
 import com.example.B2BProyect.repository.dto.request.OrdenCompraRequest;
 import com.example.B2BProyect.repository.dto.request.OrdenUpdateRequest;
+import com.example.B2BProyect.repository.dto.response.DetalleOrdenDTO;
 import com.example.B2BProyect.repository.dto.response.OrdenCompraDTO;
 import com.example.B2BProyect.repository.dto.response.OrdenEmpresaStats;
+import com.example.B2BProyect.repository.entity.DetalleOrden;
 import com.example.B2BProyect.repository.entity.Factura;
 import com.example.B2BProyect.repository.entity.OrdenCompra;
 import com.example.B2BProyect.repository.entity.Usuario;
@@ -28,9 +32,12 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrdenCompraService {
     private final OrdenCompraRepository ordenCompraRepository;
+    private final DetalleOrdenRepository detalleOrdenRepository;
     private final ProveedorService proveedorService;
     private final UsuarioService usuarioService;
     private final FacturaRepository facturaRepository;
+    private final ProductoService productoService;
+    private final AlmacenService almacenService;
 
     @Transactional
     public OrdenCompraDTO save(OrdenCompraRequest request) {
@@ -57,8 +64,29 @@ public class OrdenCompraService {
 
         orden.setIdProveedor(proveedorService.findById(request.getIdProveedor()).orElseThrow());
 
-        log.info("Guardando nueva orden: {}", orden.getId());
-        return new OrdenCompraDTO(ordenCompraRepository.save(orden));
+        OrdenCompra savedOrden = ordenCompraRepository.save(orden);
+
+        if (request.getDetalles() != null && !request.getDetalles().isEmpty()) {
+            for (DetalleOrdenRequest detRequest : request.getDetalles()) {
+                DetalleOrden detalle = new DetalleOrden();
+                detalle.setCantidad(detRequest.getCantidad());
+                detalle.setPrecioUnitario(detRequest.getPrecioUnitario());
+                detalle.setSubtotal(detRequest.getSubtotal());
+                detalle.setIdOrden(savedOrden);
+                if (detRequest.getIdProducto() != null) {
+                    productoService.findById(detRequest.getIdProducto()).ifPresent(detalle::setIdProducto);
+                }
+                if (detRequest.getIdAlmacen() != null) {
+                    almacenService.findById(detRequest.getIdAlmacen()).ifPresent(detalle::setAlmacen);
+                }
+                detalleOrdenRepository.save(detalle);
+            }
+        }
+
+        log.info("Guardando nueva orden: {}", savedOrden.getId());
+        return ordenCompraRepository.findById(savedOrden.getId())
+                .map(OrdenCompraDTO::new)
+                .orElseGet(() -> new OrdenCompraDTO(savedOrden));
     }
 
     @Transactional(readOnly = true)
@@ -120,7 +148,12 @@ public class OrdenCompraService {
     @Transactional(readOnly = true)
     public Page<OrdenCompraDTO> findByEmpresaCompradora(UUID idEmpresa, Integer size, Integer page){
         log.info("ID " + idEmpresa);
-        return ordenCompraRepository.retrieveAllFromEmpresaCompradora(idEmpresa, PageRequest.of(page, size));
+        Page<OrdenCompraDTO> pages =ordenCompraRepository.retrieveAllFromEmpresaCompradora(idEmpresa, PageRequest.of(page, size));
+        pages.forEach(x-> {
+            List<DetalleOrdenDTO> ordens = detalleOrdenRepository.findByOrden(x.getId());
+            x.setOrdens(ordens);
+        });
+        return pages;
     }
 
     @Transactional(readOnly = true)

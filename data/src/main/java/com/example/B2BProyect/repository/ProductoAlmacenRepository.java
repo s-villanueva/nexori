@@ -52,6 +52,7 @@ SELECT new com.example.B2BProyect.repository.dto.response.ProductoAlmacenDTO(
     pa.max,
     pa.min,
     pa.activo,
+    pa.almacen.id,
     pa.almacen.nombre,
     pa.producto.nombre,
     pa.almacen.idProveedor.id,

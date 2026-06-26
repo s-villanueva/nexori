@@ -64,7 +64,6 @@ public class StereumController {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
-//        template.convertAndSend("/paymenting/" + response.getTransaction().getIdempotencyKey(), response.getTransaction().getStatus());
     }
 
 }

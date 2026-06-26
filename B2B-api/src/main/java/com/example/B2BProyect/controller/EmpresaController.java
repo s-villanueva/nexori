@@ -28,8 +28,6 @@ public class EmpresaController {
 
     @GetMapping
     public ResponseEntity<Page<EmpresaDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size, @RequestParam(value = "sortBy", defaultValue = "nombre") String sortBy) {
-//        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        log.info(user.getIdRol().getNombre());
         try {
             return ResponseEntity.ok(empresaService.findAll(page,size,sortBy));
         } catch (OperationException e) {
@@ -55,24 +53,6 @@ public class EmpresaController {
         }
     }
 
-    @PostMapping("/examen")
-    public ResponseEntity<Void> metodoExamen(@RequestBody String body){
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            EmpresaDTO response = objectMapper.readValue(body, EmpresaDTO.class);
-//            this.empresaService.cambiarRegistro(response.getId());
-            return ResponseEntity.ok().build();
-        } catch (OperationException e){
-            log.error("El error es: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e){
-            log.error("El error es", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al procesar examen empresa");
-        }
-    }
-
-
     @PutMapping("/{id}")
     public ResponseEntity<EmpresaDTO> update(@PathVariable UUID id, @RequestBody EmpresaRequest dto) {
         try {
@@ -87,20 +67,6 @@ public class EmpresaController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al actualizar empresa");
         }
     }
-
-//    @PutMapping("/examen/{id}")
-//    public ResponseEntity<EmpresaDTO> updateExamen(@PathVariable UUID id, @RequestBody EmpresaRequest dto) {
-//        try {
-//            empresaService.modificarEmpresa(id, dto);
-//            return ResponseEntity.ok().build();
-//        } catch (NullPointerException e) {
-//            log.error("Empresa no se halló: {}", e.getMessage());
-//            return ResponseEntity.notFound().build();
-//        } catch (Exception e) {
-//            log.error("Error actualizando empresa: {}", e.getMessage());
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {

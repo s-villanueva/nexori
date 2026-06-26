@@ -14,6 +14,16 @@ public class DetalleOrdenDTO {
     private Integer cantidad;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;
+    private String nombreProducto;
+
+    public DetalleOrdenDTO(UUID id, Integer cantidad, BigDecimal precioUnitario, BigDecimal subtotal, String nombreProducto) {
+        this.id = id;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.subtotal = subtotal;
+        this.nombreProducto = nombreProducto;
+    }
+
     private UUID idOrden;
     private UUID idProducto;
     private UUID idAlmacen;
@@ -27,4 +37,5 @@ public class DetalleOrdenDTO {
         this.idProducto = d.getIdProducto().getId();
         this.idAlmacen = d.getAlmacen().getId();
     }
+
 }

@@ -39,13 +39,14 @@ public class ProductoAlmacenDTO {
     }
 
     public ProductoAlmacenDTO(Integer stock, BigDecimal max, BigDecimal min,
-                               Boolean activo, String nombreAlmacen, String nombreProducto,UUID idProveedor, BigDecimal precioBase, UUID idProducto) {
+                               Boolean activo, UUID idAlmacen, String nombreAlmacen, String nombreProducto,UUID idProveedor, BigDecimal precioBase, UUID idProducto) {
         this.stock = stock;
         this.max = max;
         this.min = min;
         this.activo = activo;
         this.nombreAlmacen = nombreAlmacen;
         this.nombreProducto = nombreProducto;
+        this.idAlmacen = idAlmacen;
         this.idProveedor = idProveedor;
         this.idProducto = idProducto;
         this.precioBase = precioBase;

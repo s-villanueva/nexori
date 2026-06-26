@@ -33,6 +33,7 @@ public class AuthController {
     private final UsuarioService userService;
     private final AuthenticationManager authenticationManager;
     private final PasswordResetService passwordResetService;
+    private final TotpService totpService;
 
     @PostMapping("/login")
     public ResponseEntity<?> token(
@@ -80,7 +81,6 @@ public class AuthController {
 
     public OKAuthDto auth(AuthenticationDTO data)  {
         String email = data.email();
-        log.info("Getting user email: {}", email);
         Usuario user;
         try {
             Optional<Usuario> userOptional = userService.findByEmailToValidateSession(email);
@@ -111,7 +111,6 @@ public class AuthController {
         }
     }
 
-    private final TotpService totpService;
 
     public OKAuthDto auth2FA(String data, String code)  {
         String email = data;

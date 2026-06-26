@@ -23,18 +23,6 @@ import java.util.UUID;
 public class FacturaController {
     private final FacturaService facturaService;
 
-//    @GetMapping
-//    public ResponseEntity<List<FacturaDTO>> findAll() {
-//        try {
-//            List<FacturaDTO> facturaDTOS = facturaService.findAll();
-//            System.out.println(facturaDTOS);
-//            return ResponseEntity.ok(facturaDTOS);
-//        } catch (Exception e) {
-//            log.error("Error listando factura: {}", e.getMessage());
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
-
     @GetMapping()
     public ResponseEntity<Page<FacturaDTO>> findAllByEmpresa(@RequestParam String idEmpresa, @RequestParam Integer page, @RequestParam Integer size){
         try {

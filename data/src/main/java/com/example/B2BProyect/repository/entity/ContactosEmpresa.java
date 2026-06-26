@@ -12,7 +12,6 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "contactos_empresa", indexes = {
-        @Index(name = "idx_contactos_cargo", columnList = "id_cargo_empresa"),
         @Index(name = "idx_contactos_empresa", columnList = "id_empresa")
 })
 public class ContactosEmpresa {

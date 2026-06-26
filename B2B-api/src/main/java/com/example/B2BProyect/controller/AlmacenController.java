@@ -42,8 +42,8 @@ public class AlmacenController {
         try {
             return ResponseEntity.ok(almacenService.findByIdEmpresa(UUID.fromString(idEmpresa)));
         } catch (Exception e){
-            throw e;
-//            return ResponseEntity.badRequest().build();
+            log.info(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 

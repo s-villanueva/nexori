@@ -38,27 +38,19 @@ import java.util.UUID;
 @RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
     private final UsuarioService usuarioService;
-    private final EmailService emailService;
     private final EmpresaRepository empresaRepository;
     private final SucursalEmpresaRepository sucursalRepository;
     private final RolUsuarioRepository rolRepository;
-    /*@GetMapping
-    public ResponseEntity<List<UsuarioDTO>> findAll() {
-        try {
-            return ResponseEntity.ok(usuarioService.findAll());
+
+    @GetMapping("/user-info")
+    public ResponseEntity<UsuarioDTO> retrieveSessionInfo(@RequestParam String uId){
+        try{
+            return ResponseEntity.ok(usuarioService.findByIdDTO(UUID.fromString(uId)).orElseThrow());
         } catch (Exception e) {
-            log.error("Error llamando a los usuarios: {}", e.getMessage());
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
-    }*/
-
-//    @GetMapping("/password-recovery")
-//    public ResponseEntity<String> testPasswordRecovery() {
-//        Random r = new Random();
-//        int ra = r.nextInt(100000, 999999);
-//        emailService.sendPassword("nicolascresposuarez@gmail.com", String.valueOf(ra));
-//        return ResponseEntity.ok("Email sent");
-//    }
+    }
 
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody UsuarioRequest dto) {
@@ -143,13 +135,4 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/user-info")
-    public ResponseEntity<UsuarioDTO> retrieveSessionInfo(@RequestParam String uId){
-        try{
-            log.info("EL DESCRIPTIVO" + String.valueOf(usuarioService.findByIdDTO(UUID.fromString(uId)).orElseThrow()));
-            return ResponseEntity.ok(usuarioService.findByIdDTO(UUID.fromString(uId)).orElseThrow());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }

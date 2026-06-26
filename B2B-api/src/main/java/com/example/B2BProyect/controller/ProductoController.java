@@ -49,6 +49,19 @@ public class ProductoController {
         }
     }
 
+    @GetMapping("/proveedor/{idProveedor}")
+    public ResponseEntity<List<ProductoDTO>> findByProveedor(@PathVariable UUID idProveedor) {
+        try {
+            return ResponseEntity.ok(productoService.findByProveedor(idProveedor));
+        } catch (OperationException e) {
+            log.error("Error listando productos por proveedor: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("Error listando productos por proveedor", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al listar productos por proveedor");
+        }
+    }
+
     @PostMapping(value = "/bulk-upload", consumes = "multipart/form-data")
     public ResponseEntity<Integer> uploadBulkProducts(@RequestParam("file") MultipartFile file, @RequestParam String idEmpresa, @RequestParam String idCategoria){
         try {
@@ -72,18 +85,6 @@ public class ProductoController {
         }
     }
 
-    @GetMapping("/proveedor/{idProveedor}")
-    public ResponseEntity<List<ProductoDTO>> findByProveedor(@PathVariable UUID idProveedor) {
-        try {
-            return ResponseEntity.ok(productoService.findByProveedor(idProveedor));
-        } catch (OperationException e) {
-            log.error("Error listando productos por proveedor: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            log.error("Error listando productos por proveedor", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Se generó un error genérico al listar productos por proveedor");
-        }
-    }
 
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody ProductoRequest producto) {

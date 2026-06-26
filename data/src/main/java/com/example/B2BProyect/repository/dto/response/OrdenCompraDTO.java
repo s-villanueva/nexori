@@ -7,6 +7,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -21,6 +23,7 @@ public class OrdenCompraDTO {
     private String nombreEmpresaCompradora;
     private String nombreSucursal;
     private String nombreUsuario;
+    private List<DetalleOrdenDTO> ordens;
     private ProveedorDTO idProveedor;
     private EmpresaDTO idEmpresaCompradora;
     private SucursalEmpresaDTO idSucursal;
@@ -52,17 +55,5 @@ public class OrdenCompraDTO {
         this.nombreUsuario = nombreUsuario;
     }
 
-    public OrdenCompraDTO(UUID id, BigDecimal total, Instant fecha, LocalDate fechaOrden, String idEstado,
-                          Proveedor idProveedor, Empresa idEmpresaCompradora,
-                          SucursalEmpresa idSucursal, Usuario idUsuario) {
-        this.id = id;
-        this.total = total;
-        this.fecha = fecha;
-        this.fechaOrden = fechaOrden;
-        this.idEstado = idEstado;
-        this.idProveedor = new ProveedorDTO(idProveedor);
-        this.idEmpresaCompradora = new EmpresaDTO(idEmpresaCompradora);
-        this.idSucursal = new SucursalEmpresaDTO(idSucursal);
-        this.idUsuario = new UsuarioDTO(idUsuario);
-    }
+
 }
